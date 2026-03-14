@@ -1187,12 +1187,12 @@ function isModalOpen() {
 
 function mergeStudents(localArr, remoteArr) {
   // Merge two student arrays — remote additions are kept, local additions are kept
-  // For same student id, pick the one with more recent data
+  // For same student id, remote (Firebase) wins — it is the source of truth
   const map = {};
-  // Add remote students first
-  (remoteArr || []).forEach(s => { map[s.id] = s; });
-  // Overlay local students — local changes win for same ID
+  // Add local students first
   (localArr || []).forEach(s => { map[s.id] = s; });
+  // Overlay remote students — Firebase wins for same ID
+  (remoteArr || []).forEach(s => { map[s.id] = s; });
   return Object.values(map);
 }
 
@@ -1203,8 +1203,8 @@ function smartMerge(local, remote) {
       // Smart merge students — keep both local and remote additions
       result.students = mergeStudents(local.students || [], remote.students || []);
     } else if (key === 'attendance' || key === 'fees') {
-      // Merge all date/month keys from both sides
-      result[key] = { ...(remote[key] || {}), ...(local[key] || {}) };
+      // Merge all date/month keys from both sides — Firebase wins for same keys
+      result[key] = { ...(local[key] || {}), ...(remote[key] || {}) };
     } else if (key === 'settings') {
       // Settings: local wins (user just changed them on device)
       result[key] = { ...(remote[key] || {}), ...(local[key] || {}) };
