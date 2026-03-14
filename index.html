@@ -866,18 +866,28 @@ function saveLocalOnly() {
   try { localStorage.setItem('sac_db', JSON.stringify(DB)); } catch(e){}
 }
 
-// saveLocal — saves to browser AND schedules Firebase push (used after user actions)
+// saveLocal — saves to browser only
+// Push to Firebase must be called explicitly with scheduleFirebasePush()
 function saveLocal() {
   try { localStorage.setItem('sac_db', JSON.stringify(DB)); } catch(e){}
-  if (typeof scheduleFirebasePush === 'function' && !isModalOpen()) scheduleFirebasePush();
 }
+function ensureArrays(db) {
+  // Firebase sometimes converts arrays to objects {0:{}, 1:{}} — fix them back
+  ['users','batches','students','changelog'].forEach(key => {
+    if (db[key] && !Array.isArray(db[key]) && typeof db[key] === 'object') {
+      db[key] = Object.values(db[key]);
+    }
+  });
+  return db;
+}
+
 function loadLocal() {
   try {
     const raw = localStorage.getItem('sac_db');
     if (raw) {
       const parsed = JSON.parse(raw);
-      // Deep merge to keep defaults for any missing keys
       DB = deepMerge(DB, parsed);
+      ensureArrays(DB); // fix any object-arrays from Firebase
     }
   } catch(e){}
 }
@@ -926,8 +936,7 @@ function addLog(action, detail) {
   if (!currentUser) return;
   DB.changelog.unshift({ user: currentUser.id, role: currentUser.role||'staff', action, detail, time: new Date().toISOString() });
   if (DB.changelog.length > 500) DB.changelog.length = 500;
-  saveLocal();
-  scheduleFirebasePush();
+  saveLocalOnly(); // log only — don't trigger a Firebase push
 }
 
 // ----------------------------------------------------------------
@@ -951,8 +960,7 @@ function closeConfirm() { document.getElementById('confirmDlg').classList.remove
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) {
   document.getElementById(id).classList.remove('active');
-  // After closing modal, push any pending changes to Firebase
-  if (typeof scheduleFirebasePush === 'function') scheduleFirebasePush();
+  // Don't schedule push here — each save function handles its own push
 }
 
 // ----------------------------------------------------------------
@@ -995,31 +1003,84 @@ function showLoginError(msg) {
 function doLogin() {
   const id = document.getElementById('loginId').value.trim();
   const pw = document.getElementById('loginPass').value;
-  const user = DB.users.find(u => u.id === id && u.password === pw);
-  if (!user) {
-    const idExists = DB.users.find(u => u.id === id);
-    if (!id || !pw) {
-      showLoginError('Please enter both Login ID and Password.');
-    } else if (!idExists) {
-      showLoginError('Login ID "' + id + '" not found.');
-    } else {
-      showLoginError('Incorrect password. Please try again.');
-    }
+  if (!id || !pw) {
+    showLoginError('Please enter both Login ID and Password.');
     return;
   }
-  clearLoginError();
-  currentUser = user;
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('app').classList.add('active');
-  document.getElementById('topRoleBadge').textContent = isAdmin() ? 'Admin' : 'Staff';
-  applyRoleUI();
-  updateLogos();
-  addLog('login', `Logged in`);
-  initFirebase();
-  initDashFilters();
-  initAttFilters();
-  initFeeFilters();
-  switchPage('home');
+
+  // Show loading state
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Checking...';
+  btn.disabled = true;
+
+  // Always fetch latest users from Firebase before checking login
+  const fbUrl = DB.settings.firebaseUrl;
+  const tryLogin = (usersArr) => {
+    const user = usersArr.find(u => u.id === id && u.password === pw);
+    if (!user) {
+      const idExists = usersArr.find(u => u.id === id);
+      btn.textContent = 'Login →';
+      btn.disabled = false;
+      if (!idExists) {
+        showLoginError('Login ID "' + id + '" not found.');
+      } else {
+        showLoginError('Incorrect password. Please try again.');
+      }
+      return;
+    }
+    // Merge fetched users into DB so they are available immediately
+    DB.users = usersArr;
+    saveLocalOnly();
+    clearLoginError();
+    btn.textContent = 'Login →';
+    btn.disabled = false;
+    currentUser = user;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('active');
+    document.getElementById('topRoleBadge').textContent = isAdmin() ? 'Admin' : 'Staff';
+    applyRoleUI();
+    updateLogos();
+    addLog('login', `Logged in`);
+    initFirebase();
+    initDashFilters();
+    initAttFilters();
+    initFeeFilters();
+    switchPage('home');
+  };
+
+  // Try to fetch users from Firebase first
+  if (fbUrl && typeof firebase !== 'undefined') {
+    try {
+      let tempApp, tempDb;
+      if (!firebase.apps || !firebase.apps.length) {
+        tempApp = firebase.initializeApp({ databaseURL: fbUrl });
+      } else {
+        tempApp = firebase.apps[0];
+      }
+      tempDb = firebase.database(tempApp);
+      tempDb.ref('/sacdb/users').once('value').then(snap => {
+        const remoteUsers = snap.val();
+        if (remoteUsers) {
+          // Convert object-array back to real array if needed
+          const usersArr = Array.isArray(remoteUsers)
+            ? remoteUsers
+            : Object.values(remoteUsers);
+          tryLogin(usersArr);
+        } else {
+          // Firebase has no users yet — fall back to local
+          tryLogin(DB.users);
+        }
+      }).catch(() => {
+        // Firebase unreachable — fall back to local users
+        tryLogin(DB.users);
+      });
+    } catch(e) {
+      tryLogin(DB.users);
+    }
+  } else {
+    // No Firebase configured — use local users only
+    tryLogin(DB.users);
+  }
 }
 function doLogout() {
   confirm_('🚪','Logout','Are you sure you want to logout?', () => {
@@ -1085,7 +1146,7 @@ function saveFirebaseUrl() {
   confirm_('🔥','Save Firebase URL','Connect to this Firebase database?', () => {
     DB.settings.firebaseUrl = url;
     saveLocal();
-    scheduleFirebasePush();
+    // Don't scheduleFirebasePush here — initFirebase will pull first, then sync
     addLog('firebase','Firebase URL updated');
     initFirebase();
     showToast('Firebase config saved','success');
@@ -1099,7 +1160,8 @@ function pushToFirebase() {
       DB.settings.lastPush = new Date().toISOString();
       DB.settings.lastPushBy = currentUser.id;
       saveLocal();
-      scheduleFirebasePush();
+      pendingPush = false; // clear flag — just pushed manually
+      lastFirebaseData = JSON.stringify(DB);
       const el = document.getElementById('lastPushInfo');
       if (el) el.textContent = `${new Date().toLocaleString()} by ${currentUser.id}`;
       showToast('Pushed to Firebase ✓','success');
@@ -1136,26 +1198,46 @@ function mergeStudents(localArr, remoteArr) {
 }
 
 function smartMerge(local, remote) {
-  // Deep merge but handle arrays specially
   const result = { ...local };
   for (const key of Object.keys(remote || {})) {
     if (key === 'students') {
       // Smart merge students — keep both local and remote additions
       result.students = mergeStudents(local.students || [], remote.students || []);
     } else if (key === 'attendance' || key === 'fees') {
-      // Merge date/month keys — keep all entries from both sides
+      // Merge all date/month keys from both sides
       result[key] = { ...(remote[key] || {}), ...(local[key] || {}) };
     } else if (key === 'settings') {
-      // Settings: local wins (user just changed them)
+      // Settings: local wins (user just changed them on device)
       result[key] = { ...(remote[key] || {}), ...(local[key] || {}) };
+    } else if (key === 'users') {
+      // Users: ALWAYS take from Firebase — Firebase is the master for user accounts
+      // Convert Firebase object-array (0,1,2...) back to real array if needed
+      const remoteUsers = remote[key];
+      if (Array.isArray(remoteUsers)) {
+        result[key] = remoteUsers;
+      } else if (remoteUsers && typeof remoteUsers === 'object') {
+        // Firebase sometimes stores arrays as {0:{...}, 1:{...}} — convert back
+        result[key] = Object.values(remoteUsers);
+      } else {
+        result[key] = local[key];
+      }
+    } else if (key === 'batches') {
+      // Batches: Firebase wins — admin manages batches centrally
+      const remoteBatches = remote[key];
+      if (Array.isArray(remoteBatches)) {
+        result[key] = remoteBatches;
+      } else if (remoteBatches && typeof remoteBatches === 'object') {
+        result[key] = Object.values(remoteBatches);
+      } else {
+        result[key] = local[key];
+      }
     } else if (Array.isArray(remote[key])) {
-      // For other arrays (batches, users) — local wins
-      result[key] = local[key] || remote[key];
+      // Other arrays — Firebase wins
+      result[key] = remote[key];
     } else if (remote[key] !== null && typeof remote[key] === 'object') {
       result[key] = smartMerge(local[key] || {}, remote[key]);
     } else {
-      // Primitives — local wins
-      result[key] = local[key] !== undefined ? local[key] : remote[key];
+      result[key] = remote[key] !== undefined ? remote[key] : local[key];
     }
   }
   return result;
