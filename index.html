@@ -263,6 +263,13 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
 .sync-banner-time{font-size:10px;color:var(--gray);margin-top:2px;}
 @keyframes syncPulse{0%{box-shadow:0 0 0 0 rgba(37,99,235,.5)}70%{box-shadow:0 0 0 8px rgba(37,99,235,0)}100%{box-shadow:0 0 0 0 rgba(37,99,235,0)}}
 #syncBanner.show{animation:syncPulse .6s ease;}
+/* LOADING OVERLAY */
+#loadingOverlay{position:fixed;inset:0;background:var(--royal);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#loadingOverlay.active{display:flex;}
+.loading-spinner{width:48px;height:48px;border:4px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-msg{font-size:14px;color:var(--gray);font-weight:600;}
+.loading-sub{font-size:12px;color:var(--graydk);}
 </style>
 </head>
 <body>
@@ -278,6 +285,14 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
     <div class="login-field"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" oninput="clearLoginError()"></div>
     <button class="btn-login" id="loginBtn" onclick="doLogin()">Login →</button>
   </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div style="font-size:48px;">⚔️</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-msg" id="loadingMsg">Loading data…</div>
+  <div class="loading-sub" id="loadingSub">Syncing with Firebase</div>
 </div>
 
 <!-- MAIN APP -->
@@ -884,18 +899,14 @@ let selectedBatch = { student:'ALL', att:'ALL', fee:'ALL' };
 let fbApp = null, fbDb = null, fbPullTimer = null;
 
 // ----------------------------------------------------------------
-// STORAGE
+// STORAGE — Firebase only, no localStorage
 // ----------------------------------------------------------------
-// saveLocalOnly — saves to browser only, no Firebase push (used during sync)
-function saveLocalOnly() {
-  try { localStorage.setItem('sac_db', JSON.stringify(DB)); } catch(e){}
-}
+// saveLocalOnly and saveLocal are no-ops — Firebase is the only store.
+// All writes go through scheduleFirebasePush().
+function saveLocalOnly() { /* no-op — Firebase only */ }
+function saveLocal() { /* no-op — Firebase only */ }
+function loadLocal() { /* no-op — Firebase only */ }
 
-// saveLocal — saves to browser only
-// Push to Firebase must be called explicitly with scheduleFirebasePush()
-function saveLocal() {
-  try { localStorage.setItem('sac_db', JSON.stringify(DB)); } catch(e){}
-}
 function ensureArrays(db) {
   // Firebase sometimes converts arrays to objects {0:{}, 1:{}} — fix them back
   ['users','batches','students','changelog'].forEach(key => {
@@ -906,16 +917,6 @@ function ensureArrays(db) {
   return db;
 }
 
-function loadLocal() {
-  try {
-    const raw = localStorage.getItem('sac_db');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      DB = deepMerge(DB, parsed);
-      ensureArrays(DB); // fix any object-arrays from Firebase
-    }
-  } catch(e){}
-}
 function deepMerge(base, override) {
   const result = { ...base };
   for (const key of Object.keys(override)) {
@@ -961,7 +962,7 @@ function addLog(action, detail) {
   if (!currentUser) return;
   DB.changelog.unshift({ user: currentUser.id, role: currentUser.role||'staff', action, detail, time: new Date().toISOString() });
   if (DB.changelog.length > 500) DB.changelog.length = 500;
-  saveLocalOnly(); // log only — don't trigger a Firebase push
+  scheduleFirebasePush(); // push log to Firebase
 }
 
 // ----------------------------------------------------------------
@@ -1055,22 +1056,33 @@ function doLogin() {
     }
     // Merge fetched users into DB so they are available immediately
     DB.users = usersArr;
-    saveLocalOnly();
+    // No local save — Firebase is the source of truth
     clearLoginError();
     btn.textContent = 'Login →';
     btn.disabled = false;
     currentUser = user;
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').classList.add('active');
+    // Show loading overlay while Firebase pulls data
+    const overlay = document.getElementById('loadingOverlay');
+    const loadMsg = document.getElementById('loadingMsg');
+    const loadSub = document.getElementById('loadingSub');
+    if (overlay) overlay.classList.add('active');
+    if (loadMsg) loadMsg.textContent = 'Welcome, ' + (user.name || user.id) + '!';
+    if (loadSub) loadSub.textContent = 'Fetching latest data from server…';
     document.getElementById('topRoleBadge').textContent = isAdmin() ? 'Admin' : 'Staff';
     applyRoleUI();
     updateLogos();
-    addLog('login', `Logged in`);
-    initFirebase();
-    initDashFilters();
-    initAttFilters();
-    initFeeFilters();
-    switchPage('home');
+    addLog('login', 'Logged in');
+    // Wait for Firebase pull to complete BEFORE showing the app
+    initFirebase().then(() => {
+      if (overlay) overlay.classList.remove('active');
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').classList.add('active');
+      initDashFilters();
+      initAttFilters();
+      initFeeFilters();
+      switchPage('home');
+      showToast('Welcome, ' + (user.name || user.id) + '! ✓', 'success');
+    });
   };
 
   // Try to fetch users from Firebase first
@@ -1131,49 +1143,52 @@ function applyRoleUI() {
 // ----------------------------------------------------------------
 function initFirebase() {
   const url = DB.settings.firebaseUrl;
-  if (!url) return;
-  try {
-    if (typeof firebase === 'undefined') return;
-    if (!firebase.apps || !firebase.apps.length) {
-      fbApp = firebase.initializeApp({ databaseURL: url });
-    } else {
-      fbApp = firebase.apps[0];
-    }
-    fbDb = firebase.database(fbApp);
-    const el = document.getElementById('fbStatus');
-    if (el) el.textContent = '🟡 Connecting...';
-    // On login: ALWAYS pull Firebase first, merge, then start sync timer
-    fbDb.ref('/sacdb').once('value').then(snap => {
-      const remote = snap.val();
-      if (remote) {
-        DB = smartMerge(DB, remote); // merge Firebase into local — Firebase wins for existing data
-        ensureArrays(DB);
-        saveLocalOnly();
-        refreshCurrentPage();
-        lastKnownDB = JSON.stringify(remote); // set baseline — no notification on first load
-        if (el) el.textContent = '🟢 Connected & pulled latest data';
-        showToast('Synced with Firebase ✓', 'success');
+  if (!url) return Promise.resolve();
+  return new Promise(resolve => {
+    try {
+      if (typeof firebase === 'undefined') return resolve();
+      if (!firebase.apps || !firebase.apps.length) {
+        fbApp = firebase.initializeApp({ databaseURL: url });
       } else {
-        // Firebase is empty — push local data up
-        pendingPush = true;
-        if (el) el.textContent = '🟢 Connected (new database)';
+        fbApp = firebase.apps[0];
       }
-      startPull(); // start the background sync timer AFTER initial pull
-    }).catch(e => {
+      fbDb = firebase.database(fbApp);
+      const el = document.getElementById('fbStatus');
+      if (el) el.textContent = '🟡 Connecting...';
+      // Pull ALL data from Firebase before showing the app
+      fbDb.ref('/sacdb').once('value').then(snap => {
+        const remote = snap.val();
+        if (remote) {
+          DB = smartMerge(DB, remote);
+          ensureArrays(DB);
+          saveLocalOnly();
+          lastKnownDB = JSON.stringify(remote);
+          if (el) el.textContent = '🟢 Connected & pulled latest data';
+        } else {
+          // Firebase is empty — push local data up
+          pendingPush = true;
+          if (el) el.textContent = '🟢 Connected (new database)';
+        }
+        startPull();
+        resolve(); // ← unblock login AFTER data is ready
+      }).catch(e => {
+        if (el) el.textContent = '🔴 ' + e.message;
+        startPull();
+        resolve(); // still unblock — fall back to local data
+      });
+    } catch(e) {
+      const el = document.getElementById('fbStatus');
       if (el) el.textContent = '🔴 ' + e.message;
-      startPull(); // still start timer so it retries
-    });
-  } catch(e) {
-    const el = document.getElementById('fbStatus');
-    if (el) el.textContent = '🔴 ' + e.message;
-  }
+      resolve();
+    }
+  });
 }
 function saveFirebaseUrl() {
   const url = document.getElementById('firebaseUrlInput').value.trim();
   confirm_('🔥','Save Firebase URL','Connect to this Firebase database?', () => {
     DB.settings.firebaseUrl = url;
-    saveLocal();
-    // Don't scheduleFirebasePush here — initFirebase will pull first, then sync
+    // Store only the URL in localStorage — it's needed before login to connect
+    try { localStorage.setItem('sac_firebaseUrl', url); } catch(e){}
     addLog('firebase','Firebase URL updated');
     initFirebase();
     showToast('Firebase config saved','success');
@@ -3615,7 +3630,13 @@ function escHtml(str) {
 // ================================================================
 // INIT
 // ================================================================
-loadLocal();
+// Firebase is the only source of truth — clear stale app data
+try { localStorage.removeItem('sac_db'); } catch(e){}
+// Only restore the Firebase URL (needed before login to know which DB to connect to)
+try {
+  const savedUrl = localStorage.getItem('sac_firebaseUrl');
+  if (savedUrl) DB.settings.firebaseUrl = savedUrl;
+} catch(e){}
 updateLogos();
 applyAcadSettings();
 applyLoginBg();
