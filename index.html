@@ -1762,37 +1762,86 @@ function handleImportFile(e) {
   }
 }
 
+// Parse a single CSV line, handling quoted fields
+function parseCSVLine(line) {
+  const cols = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+    else cur += c;
+  }
+  cols.push(cur.trim());
+  return cols;
+}
+
+function normHeader(s) {
+  return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+const HEADER_MAP = {
+  'name':'name','studentname':'name','fullname':'name',
+  'batch':'batch','batchname':'batch','group':'batch','class':'batch',
+  'age':'age',
+  'dob':'dob','dateofbirth':'dob','birthdate':'dob','birthday':'dob',
+  'parent':'parent','parentname':'parent','guardian':'parent','guardianname':'parent',
+  'contact':'contact','contact1':'contact','phone':'contact','mobile':'contact','phonenumber':'contact',
+  'contact2':'contact2','phone2':'contact2','altcontact':'contact2','alternatecontact':'contact2',
+  'school':'address','schoolname':'address','college':'address','address':'address',
+  'joindate':'joinDate','joiningdate':'joinDate','joined':'joinDate','dateofjoining':'joinDate',
+};
+
+function excelDateToDisplay(val) {
+  if (!val) return '';
+  const s = String(val).trim();
+  // Excel serial number
+  if (/^\d{4,5}$/.test(s)) {
+    const d = new Date(Math.round((parseFloat(s) - 25569) * 86400 * 1000));
+    if (!isNaN(d)) return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+  }
+  // ISO YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const p = s.split('-');
+    return p[2].slice(0,2)+'/'+p[1]+'/'+p[0];
+  }
+  return s; // already DD/MM/YYYY or other — keep as-is
+}
+
 function parseImportCSV(text) {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length < 2) { showImportError('File must have a header row and at least one data row.'); return; }
-  // Skip header row (index 0)
-  const rows = lines.slice(1).map(line => {
-    // Handle quoted CSV fields
-    const cols = [];
-    let cur = '', inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (c === '"') { inQ = !inQ; }
-      else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-      else cur += c;
-    }
-    cols.push(cur.trim());
-    return cols;
-  }).filter(cols => cols[0] && cols[0].trim());
 
-  if (!rows.length) { showImportError('No valid data rows found.'); return; }
+  const headerCols = parseCSVLine(lines[0]);
+  const colMap = {};
+  headerCols.forEach((h, i) => {
+    const key = HEADER_MAP[normHeader(h)];
+    if (key && !(key in colMap)) colMap[key] = i;
+  });
 
-  importRows = rows.map(cols => ({
-    name:     (cols[0]||'').trim(),
-    batch:    (cols[1]||DB.batches[0]||'').trim(),
-    age:      (cols[2]||'').trim(),
-    dob:      (cols[3]||'').trim(),
-    parent:   (cols[4]||'').trim(),
-    contact:  (cols[5]||'').trim(),
-    contact2: (cols[6]||'').trim(),
-    address:  (cols[7]||'').trim(),
-    joinDate: (cols[8]||fmtDate(new Date())).trim(),
-  })).filter(r => r.name);
+  if (colMap['name'] === undefined) {
+    showImportError('Could not find a "Name" column. Make sure your first row has column headers.');
+    return;
+  }
+
+  const todayFmt = todayDisplay();
+  importRows = lines.slice(1).map(line => {
+    const cols = parseCSVLine(line);
+    const get = key => colMap[key] !== undefined ? (cols[colMap[key]] || '').trim() : '';
+    const name = get('name');
+    if (!name) return null;
+    return {
+      name,
+      batch:    get('batch') || (DB.batches[0] || ''),
+      age:      get('age'),
+      dob:      excelDateToDisplay(get('dob')),
+      parent:   get('parent'),
+      contact:  get('contact'),
+      contact2: get('contact2'),
+      address:  get('address'),
+      joinDate: excelDateToDisplay(get('joinDate')) || todayFmt,
+    };
+  }).filter(Boolean);
 
   if (!importRows.length) { showImportError('No students with valid names found.'); return; }
   showImportPreview();
@@ -1824,29 +1873,31 @@ function showImportError(msg) {
 function confirmImport() {
   if (!importRows.length) return;
   confirm_('⬆️', 'Import Students', `Import ${importRows.length} student(s) into the database?`, () => {
-    let added = 0;
+    let added = 0, skipped = 0;
     importRows.forEach(r => {
-      // Skip if exact same name already exists in same batch
-      const dup = DB.students.find(s => s.name.toLowerCase() === r.name.toLowerCase() && (s.batch||'') === (r.batch||''));
-      if (dup) return;
+      // Skip only if exact same name AND contact already exists (avoid blocking re-imports with different batches)
+      const dup = DB.students.find(s =>
+        s.name.toLowerCase() === r.name.toLowerCase() &&
+        s.contact && r.contact && s.contact === r.contact
+      );
+      if (dup) { skipped++; return; }
       DB.students.push({
         id: 'st_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
         name: r.name, batch: r.batch, age: r.age, dob: r.dob,
         parent: r.parent, contact: r.contact, contact2: r.contact2,
-        address: r.address, joinDate: r.joinDate || fmtDate(new Date()),
+        address: r.address, joinDate: r.joinDate || todayDisplay(),
         banned: false
       });
       added++;
     });
-    saveLocal();
     scheduleFirebasePush();
     addLog('student_import', `Imported ${added} student(s)`);
     closeModal('modalImport');
     renderStudentList();
     renderBatchChips('student');
     showToast(added + ' student(s) imported ✓', 'success');
-    if (added < importRows.length)
-      setTimeout(() => showToast((importRows.length - added) + ' duplicate(s) skipped', 'warning'), 1200);
+    if (skipped > 0)
+      setTimeout(() => showToast(skipped + ' duplicate(s) skipped', 'warn'), 1200);
   });
 }
 
