@@ -1159,9 +1159,8 @@ function initFirebase() {
       fbDb.ref('/sacdb').once('value').then(snap => {
         const remote = snap.val();
         if (remote) {
-          DB = smartMerge(DB, remote);
-          ensureArrays(DB);
-          saveLocalOnly();
+          DB = ensureArrays(remote);
+          try { const u = localStorage.getItem('sac_firebaseUrl'); if(u) DB.settings.firebaseUrl = u; } catch(e){}
           lastKnownDB = JSON.stringify(remote);
           if (el) el.textContent = '🟢 Connected & pulled latest data';
         } else {
@@ -1198,7 +1197,9 @@ function pushToFirebase() {
   if (!fbDb) { showToast('Firebase not connected','error'); return; }
   confirm_('⬆️','Manual Push','Push all local data to Firebase now?', () => {
     isSyncing = true;
-    fbDb.ref('/sacdb').set(DB).then(() => {
+    const manualSnap = JSON.parse(JSON.stringify(DB));
+    if (manualSnap.settings) delete manualSnap.settings.firebaseUrl;
+    fbDb.ref('/sacdb').set(manualSnap).then(() => {
       DB.settings.lastPush = new Date().toISOString();
       DB.settings.lastPushBy = currentUser.id;
       saveLocal();
@@ -1407,11 +1408,14 @@ function startPull() {
     // Skip if a modal/form is open — don't disrupt user mid-edit
     if (isModalOpen()) return;
 
-    // Always apply Firebase data — Firebase is the source of truth
-    notifyFirebaseUpdate(remote, false); // detect & show what changed BEFORE merging
-    DB = smartMerge(DB, remote);
-    ensureArrays(DB);
-    saveLocalOnly();
+    // Directly assign Firebase data — no local data to merge with
+    notifyFirebaseUpdate(remote, false);
+    DB = ensureArrays(remote);
+    // Preserve device-only settings
+    if (DB.settings && currentUser) {
+      const fbUrl = DB.settings.firebaseUrl || DB.settings.firebaseUrl;
+      try { const u = localStorage.getItem('sac_firebaseUrl'); if(u) DB.settings.firebaseUrl = u; } catch(e){}
+    }
     refreshCurrentPage();
 
     const st = document.getElementById('fbStatus');
@@ -1437,6 +1441,8 @@ function doPush() {
   isSyncing = true;
   pendingPush = false;
   const snapshot = JSON.parse(JSON.stringify(DB)); // snapshot to push
+  // Don't store device-specific firebaseUrl in the cloud
+  if (snapshot.settings) delete snapshot.settings.firebaseUrl;
   notifyFirebaseUpdate(snapshot, true); // show what WE are pushing BEFORE it goes up
   fbDb.ref('/sacdb').set(snapshot).then(() => {
     DB.settings.lastPush = new Date().toISOString();
@@ -1471,11 +1477,10 @@ function manualPull() {
   fbDb.ref('/sacdb').once('value').then(snap => {
     const remote = snap.val();
     if (remote) {
-      DB = smartMerge(DB, remote);
-      ensureArrays(DB);
-      saveLocalOnly();
+      DB = ensureArrays(remote);
+      try { const u = localStorage.getItem('sac_firebaseUrl'); if(u) DB.settings.firebaseUrl = u; } catch(e){}
       refreshCurrentPage();
-      showToast('Data pulled & merged ✓','success');
+      showToast('Data pulled from Firebase ✓','success');
     } else { showToast('No data on Firebase','error'); }
   }).catch(e => showToast('Pull failed: '+e.message,'error'));
 }
