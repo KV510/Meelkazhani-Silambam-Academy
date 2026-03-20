@@ -908,10 +908,17 @@ function saveLocal() { /* no-op — Firebase only */ }
 function loadLocal() { /* no-op — Firebase only */ }
 
 function ensureArrays(db) {
+  // Guarantee top-level keys always exist so nothing can crash reading them
+  if (!db.settings   || typeof db.settings !== 'object') db.settings   = {};
+  if (!db.attendance || typeof db.attendance !== 'object') db.attendance = {};
+  if (!db.fees       || typeof db.fees !== 'object')      db.fees       = {};
+
   // Firebase sometimes converts arrays to objects {0:{}, 1:{}} — fix them back
   ['users','batches','students','changelog'].forEach(key => {
-    if (db[key] && !Array.isArray(db[key]) && typeof db[key] === 'object') {
-      db[key] = Object.values(db[key]);
+    if (!db[key]) {
+      db[key] = [];  // missing key → safe empty array
+    } else if (!Array.isArray(db[key]) && typeof db[key] === 'object') {
+      db[key] = Object.values(db[key]);  // Firebase object-array → real array
     }
   });
   return db;
@@ -1477,8 +1484,13 @@ function manualPull() {
   fbDb.ref('/sacdb').once('value').then(snap => {
     const remote = snap.val();
     if (remote) {
+      // Preserve the device-level Firebase URL before overwriting DB
+      let savedUrl = null;
+      try { savedUrl = localStorage.getItem('sac_firebaseUrl'); } catch(e){}
       DB = ensureArrays(remote);
-      try { const u = localStorage.getItem('sac_firebaseUrl'); if(u) DB.settings.firebaseUrl = u; } catch(e){}
+      if (savedUrl) DB.settings.firebaseUrl = savedUrl;
+      // Keep lastKnownDB in sync so the real-time listener doesn't fire a stale diff
+      lastKnownDB = JSON.stringify(remote);
       refreshCurrentPage();
       showToast('Data pulled from Firebase ✓','success');
     } else { showToast('No data on Firebase','error'); }
