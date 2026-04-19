@@ -18,8 +18,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<!-- Firebase replaced with direct REST API — no SDK needed -->
 <style>
 :root{
   --royal:#0a1628;--royal2:#0d2040;--royal3:#122654;
@@ -73,10 +72,10 @@ input,select,textarea{font-family:var(--font);}
 
 /* BOTTOM NAV */
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--royal2);border-top:1px solid var(--border);display:flex;z-index:200;height:60px;}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--gray);font-size:10px;font-weight:500;transition:color .2s;padding:6px 2px;border:none;background:none;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--gray);font-size:10px;font-weight:500;transition:color .2s;padding:4px 1px;border:none;background:none;}
 .nav-item.active{color:var(--gold);}
-.nav-item svg{width:21px;height:21px;}
-.nav-item span{font-size:9px;letter-spacing:-.2px;overflow:hidden;text-overflow:clip;white-space:nowrap;max-width:100%;}
+.nav-item svg{width:18px;height:18px;}
+.nav-item span{font-size:8px;letter-spacing:-.3px;overflow:hidden;text-overflow:clip;white-space:nowrap;max-width:100%;}
 
 /* PAGES */
 .page{display:none;padding:14px;}
@@ -208,8 +207,13 @@ tr:hover td{background:var(--card2);}
 .log-row:last-child{border-bottom:none;}
 .log-meta{color:var(--gray);font-size:10px;margin-top:2px;}
 
-/* MISC */
-.att-date-header{background:var(--card2);padding:8px 12px;font-size:12px;color:var(--gold);font-weight:600;border-radius:6px;margin-bottom:8px;}
+/* MSG LOG */
+.msg-log-row{padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;}
+.msg-log-row:last-child{border-bottom:none;}
+.msg-log-meta{color:var(--gray);font-size:10px;margin-top:2px;}
+.msg-sent-badge{display:inline-flex;align-items:center;gap:3px;background:#22c55e22;color:#4ade80;border:1px solid #22c55e44;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:600;}
+.msg-whatsapp-badge{display:inline-flex;align-items:center;gap:3px;background:#25d36622;color:#25d366;border:1px solid #25d36644;border-radius:20px;padding:1px 6px;font-size:10px;font-weight:600;}
+background:var(--card2);padding:8px 12px;font-size:12px;color:var(--gold);font-weight:600;border-radius:6px;margin-bottom:8px;}
 .search-input{width:100%;padding:9px 12px;background:var(--royal2);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:13px;outline:none;margin-bottom:8px;}
 .search-input:focus{border-color:var(--accent2);}
 .divider{height:1px;background:var(--border);margin:10px 0;}
@@ -305,6 +309,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <div>
         <div class="academy-name" id="topAcadName">MEELKAZHANI SILAMBAM</div>
         <div class="academy-sub" id="topRoleBadge">Admin</div>
+        <div style="font-size:10px;color:var(--gold);font-weight:600;line-height:1;" id="topUserName"></div>
       </div>
     </div>
     <div class="topbar-right">
@@ -531,12 +536,24 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <div id="feeListWrap"></div>
     </div>
 
+    <!-- ===== ENQUIRY / QUERIES ===== -->
+    <div class="page" id="pageEnquiry">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="section-title" style="margin-bottom:0;">💬 Queries</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddEnquiryModal()">+ Add</button>
+      </div>
+      <div style="position:relative;margin-bottom:8px;">
+  <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:.5;" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input type="text" class="search-input" placeholder="Search by name or phone…" id="enquirySearch" oninput="renderEnquiryList()" style="padding-left:34px;margin-bottom:0;">
+</div>
+      <div id="enquiryListWrap"></div>
+    </div>
+
     <!-- ===== PROFILE ===== -->
     <div class="page" id="pageProfile">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="section-title" style="margin-bottom:0;">👤 Profile</div>
         <div style="display:flex;gap:6px;">
-          <button class="btn btn-outline btn-sm" onclick="openNoteModal()">📝 Notes</button>
           <button class="btn btn-danger btn-sm" onclick="doLogout()">Logout</button>
         </div>
       </div>
@@ -638,6 +655,21 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         <div id="importDataStatus" style="font-size:11px;margin-top:8px;display:none;"></div>
       </div>
 
+      <!-- Daily Snapshots — Admin only -->
+      <div class="card admin-only" id="snapshotCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div class="section-title" style="margin-bottom:0;font-size:12px;">📸 Daily Snapshots</div>
+          <button class="btn btn-primary btn-xs" onclick="takeSnapshotNow()">📸 Snap Now</button>
+        </div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:10px;line-height:1.6;">
+          Auto-snapshot at <b style="color:var(--gold);">12:00 AM every day</b>. Last 30 days kept.
+          Tap <b>↩ Restore</b> to recover all data from any snapshot.
+        </div>
+        <div id="snapshotListWrap" style="max-height:300px;overflow-y:auto;">
+          <div class="empty-state" style="padding:14px;">No snapshots yet.</div>
+        </div>
+      </div>
+
       <!-- Batch Management — Admin only -->
       <div class="card admin-only" id="batchCard">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -667,6 +699,29 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <div class="card" id="staffLogCard" style="display:none;">
         <div class="section-title" style="font-size:12px;">📋 My Activity</div>
         <div id="staffLogWrap" style="max-height:200px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- Default Fee Reminder Message — Admin only -->
+      <div class="card admin-only" id="defaultMsgCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="section-title" style="margin-bottom:0;font-size:12px;">&#10003;&#65039; Default Fee Reminder Message</div>
+        </div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:8px;line-height:1.6;">
+          Use <b style="color:var(--gold);">{name}</b> for student name, <b style="color:var(--gold);">{month}</b> for fee month, <b style="color:var(--gold);">{academy}</b> for academy name.
+        </div>
+        <textarea class="form-input" id="profileMsgTemplate" rows="4" style="resize:none;line-height:1.7;margin-bottom:10px;"></textarea>
+        <button class="btn btn-primary btn-sm" style="width:100%;" onclick="saveProfileMsgTemplate()">&#128190; Save Message Template</button>
+      </div>
+
+      <!-- Message Log — all users see their own; admin sees all -->
+      <div class="card" id="msgLogCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div class="section-title" style="margin-bottom:0;font-size:12px;">&#128232; Fee Reminder Logs</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-xs btn-outline" onclick="renderMsgLog()">&#128260; Refresh</button>
+          </div>
+        </div>
+        <div id="msgLogWrap" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;"></div>
       </div>
 
       <!-- Hidden font size trigger — tap 5x to reveal -->
@@ -718,6 +773,10 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
     <button class="nav-item" id="nav-fees" onclick="switchPage('fees')">
       <svg viewBox="0 0 24 24" width="27" height="27"><text x="12" y="19" text-anchor="middle" font-size="22" font-weight="bold" fill="currentColor" font-family="Arial Unicode MS,Noto Sans,sans-serif">&#8377;</text></svg>
       <span>Fees</span>
+    </button>
+    <button class="nav-item" id="nav-enquiry" onclick="switchPage('enquiry')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Queries</span>
     </button>
     <button class="nav-item" id="nav-profile" onclick="switchPage('profile')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -846,6 +905,63 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
   </div>
 </div>
 
+<!-- ADD ENQUIRY MODAL -->
+<div class="modal-overlay" id="modalAddEnquiry">
+  <div class="modal">
+    <div class="modal-title">💬 New Query<button class="modal-close" onclick="closeModal('modalAddEnquiry')">×</button></div>
+    <div class="form-group"><label class="form-label">Person Name *</label><input type="text" class="form-input" id="enqName" placeholder="Enter full name"></div>
+    <div class="form-group"><label class="form-label">Phone Number *</label><input type="tel" class="form-input" id="enqPhone" placeholder="Enter phone number" inputmode="numeric"></div>
+    <div class="form-group"><label class="form-label">Query / Interest *</label><textarea class="form-input" id="enqQuery" rows="3" placeholder="What are they enquiring about?" style="resize:none;"></textarea></div>
+    <div class="form-group"><label class="form-label">Location / Area</label><input type="text" class="form-input" id="enqLocation" placeholder="City or area (optional)"></div>
+    <div style="background:var(--card2);border-radius:8px;padding:8px 11px;margin-bottom:12px;font-size:11px;color:var(--gray);">🕐 Date &amp; time recorded automatically.</div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveEnquiry()">💾 Save Query</button>
+  </div>
+</div>
+<!-- ENQUIRY DETAIL MODAL -->
+<div class="modal-overlay" id="modalEnquiryDetail">
+  <div class="modal">
+    <div class="modal-title">💬 Query Details<button class="modal-close" onclick="closeModal('modalEnquiryDetail')">×</button></div>
+    <div id="enquiryDetailBody"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-danger btn-sm" style="flex:1;" id="enqDeleteBtn">🗑️ Delete</button>
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="closeModal('modalEnquiryDetail')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- MSG TEMPLATE MODAL (Admin only) -->
+<div class="modal-overlay" id="modalMsgTemplate">
+  <div class="modal">
+    <div class="modal-title">✉️ Default Fee Reminder Message<button class="modal-close" onclick="closeModal('modalMsgTemplate')">×</button></div>
+    <div style="font-size:11px;color:var(--gray);margin-bottom:10px;line-height:1.6;">
+      Use <b style="color:var(--gold);">{name}</b> for student name, <b style="color:var(--gold);">{month}</b> for fee month, <b style="color:var(--gold);">{academy}</b> for academy name.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message Template</label>
+      <textarea class="form-input" id="msgTemplateInput" rows="6" style="resize:none;line-height:1.7;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" style="flex:1;" onclick="closeModal('modalMsgTemplate')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;padding:12px;" onclick="saveMsgTemplate()">💾 Save Template</button>
+    </div>
+  </div>
+</div>
+
+<!-- SEND MSG MODAL -->
+<div class="modal-overlay" id="modalSendMsg">
+  <div class="modal">
+    <div class="modal-title">📨 Send Fee Reminder<button class="modal-close" onclick="closeModal('modalSendMsg')">×</button></div>
+    <div id="sendMsgStudentInfo" style="background:var(--card2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:13px;"></div>
+    <div class="form-group">
+      <label class="form-label">Message</label>
+      <textarea class="form-input" id="sendMsgText" rows="5" style="resize:none;line-height:1.7;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button class="btn btn-outline btn-sm" style="flex:1;" onclick="sendFeeMsg('sms')" id="btnSendSMS">📱 SMS</button>
+      <button class="btn btn-success btn-sm" style="flex:2;" onclick="sendFeeMsg('whatsapp')" id="btnSendWhatsApp">💬 WhatsApp</button>
+    </div>
+  </div>
+</div>
 <!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirmDlg">
   <div class="confirm-box">
@@ -879,7 +995,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
 // DATABASE
 // ================================================================
 let DB = {
-  settings: { academyName:'MEELKAZHANI SILAMBAM ACADEMY', logoUrl:'', email:'meelkazhanisilambam@gmail.com', phone:'+91 8883385215', tagline:'Admin & Staff Portal', loginBgUrl:'', firebaseUrl:'https://meelkazhani-silambam-academy-default-rtdb.asia-southeast1.firebasedatabase.app', lastPush:'', lastPushBy:'' },
+  settings: { academyName:'MEELKAZHANI SILAMBAM ACADEMY', logoUrl:'', email:'meelkazhanisilambam@gmail.com', phone:'+91 8883385215', tagline:'Admin & Staff Portal', loginBgUrl:'', firebaseUrl:'https://meelkazhani-silambam-academy-default-rtdb.asia-southeast1.firebasedatabase.app', lastPush:'', lastPushBy:'', msgTemplate:'Dear {name}, your fee for {month} is pending at {academy}. Kindly pay at the earliest. Thank you.' },
   users: [
     { id:'admin', password:'admin123', name:'Admin', role:'admin' },
     { id:'staff1', password:'staff123', name:'Staff 1', role:'staff' }
@@ -889,14 +1005,16 @@ let DB = {
   attendance: {},  // { "YYYY-MM-DD": { studentId: "P"|"A" } }
   fees: {},         // { "YYYY-MM":    { studentId: { status, amount, method, date, by } } }
   notes: '',
-  changelog: []
+  enquiries: [],
+  snapshotIndex: [],
+  changelog: [],
+  msgLogs: []
 };
 
 let currentUser = null;
 let currentPage = 'home';
 let editStudId = null;
 let selectedBatch = { student:'ALL', att:'ALL', fee:'ALL' };
-let fbApp = null, fbDb = null, fbPullTimer = null;
 
 // ----------------------------------------------------------------
 // STORAGE — Firebase only, no localStorage
@@ -907,6 +1025,228 @@ function saveLocalOnly() { /* no-op — Firebase only */ }
 function saveLocal() { /* no-op — Firebase only */ }
 function loadLocal() { /* no-op — Firebase only */ }
 
+// ================================================================
+// ENQUIRY / QUERIES
+// ================================================================
+function openAddEnquiryModal() {
+  document.getElementById('enqName').value = '';
+  document.getElementById('enqPhone').value = '';
+  document.getElementById('enqQuery').value = '';
+  document.getElementById('enqLocation').value = '';
+  openModal('modalAddEnquiry');
+}
+function saveEnquiry() {
+  const name  = (document.getElementById('enqName').value  || '').trim();
+  const phone = (document.getElementById('enqPhone').value || '').trim();
+  const query = (document.getElementById('enqQuery').value || '').trim();
+  const loc   = (document.getElementById('enqLocation').value || '').trim();
+  if (!name)  { showToast('Name is required', 'error');  return; }
+  if (!phone) { showToast('Phone is required', 'error'); return; }
+  if (!query) { showToast('Query is required', 'error'); return; }
+  if (!Array.isArray(DB.enquiries)) DB.enquiries = [];
+  DB.enquiries.unshift({ id:'enq_'+Date.now(), name, phone, query, location:loc, datetime:new Date().toISOString() });
+  scheduleFirebasePush();
+  closeModal('modalAddEnquiry');
+  renderEnquiryList();
+  showToast('Query saved ✓', 'success');
+  addLog('enquiry', 'Added query for ' + name);
+}
+function renderEnquiryList() {
+  const wrap = document.getElementById('enquiryListWrap');
+  if (!wrap) return;
+  if (!Array.isArray(DB.enquiries)) DB.enquiries = [];
+  const search = (document.getElementById('enquirySearch')?.value || '').toLowerCase();
+  let list = DB.enquiries;
+  if (search) list = list.filter(q => q.name.toLowerCase().includes(search) || (q.phone||'').toLowerCase().includes(search));
+  if (!list.length) { wrap.innerHTML = '<div class="empty-state">No queries yet.<br>Tap <b>+ Add</b> to record one.</div>'; return; }
+  wrap.innerHTML = list.map(q => `
+    <div onclick="openEnquiryDetail('${escHtml(q.id)}')"
+         style="display:flex;align-items:center;justify-content:space-between;background:var(--card);
+                border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+                margin-bottom:7px;cursor:pointer;gap:10px;">
+      <div style="display:flex;align-items:center;gap:11px;min-width:0;flex:1;">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--accent2);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:16px;font-weight:700;color:#fff;flex-shrink:0;">
+          ${escHtml(q.name.charAt(0).toUpperCase())}
+        </div>
+        <div style="min-width:0;">
+          <div style="font-size:14px;font-weight:700;color:var(--white);margin-bottom:2px;
+                      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(q.name)}</div>
+          <div style="font-size:12px;color:var(--accent2);">📞 ${escHtml(q.phone)}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--gray);text-align:right;flex-shrink:0;white-space:nowrap;">
+        ${enqRelTime(q.datetime)}
+      </div>
+    </div>`).join('');
+}
+function openEnquiryDetail(id) {
+  const q = (DB.enquiries||[]).find(x => x.id === id);
+  if (!q) return;
+  document.getElementById('enquiryDetailBody').innerHTML = `
+    <div style="background:var(--card2);border-radius:10px;padding:14px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:var(--accent2);
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:20px;font-weight:700;color:#fff;flex-shrink:0;">
+          ${escHtml(q.name.charAt(0).toUpperCase())}
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:2px;">${escHtml(q.name)}</div>
+          <a href="tel:${escHtml(q.phone)}"
+             style="font-size:13px;color:var(--accent2);font-weight:600;text-decoration:none;">
+            📞 ${escHtml(q.phone)}
+          </a>
+        </div>
+      </div>
+      <div style="display:grid;gap:8px;">
+        <div style="background:var(--royal2);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:.5px;">QUERY</div>
+          <div style="font-size:13px;line-height:1.6;">${escHtml(q.query)}</div>
+        </div>
+        ${q.location ? `<div style="background:var(--royal2);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:.5px;">LOCATION</div>
+          <div style="font-size:13px;">📍 ${escHtml(q.location)}</div>
+        </div>` : ''}
+        <div style="background:var(--royal2);border-radius:8px;padding:10px 12px;">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:4px;letter-spacing:.5px;">DATE &amp; TIME</div>
+          <div style="font-size:13px;">🕐 ${enqFullDate(q.datetime)}</div>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('enqDeleteBtn').onclick = () => deleteEnquiry(id);
+  openModal('modalEnquiryDetail');
+}
+function deleteEnquiry(id) {
+  confirm_('🗑️','Delete Query','Delete this query permanently?', () => {
+    DB.enquiries = (DB.enquiries||[]).filter(q => q.id !== id);
+    scheduleFirebasePush();
+    closeModal('modalEnquiryDetail');
+    renderEnquiryList();
+    showToast('Deleted ✓','success');
+  });
+}
+function enqRelTime(iso) {
+  if (!iso) return '';
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60)    return 'Just now';
+  if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  const d = new Date(iso);
+  return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear();
+}
+function enqFullDate(iso) {
+  if (!iso) return '—';
+  const d=new Date(iso);
+  const DAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const h=d.getHours(), m=d.getMinutes();
+  return DAY[d.getDay()]+', '+d.getDate()+' '+MON[d.getMonth()]+' '+d.getFullYear()+
+    ' at '+((h%12)||12)+':'+pad(m)+' '+(h>=12?'PM':'AM');
+}
+
+// ================================================================
+// DAILY SNAPSHOTS
+// ================================================================
+function snapDateKey(d) {
+  d = d || new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+async function takeSnapshot(label) {
+  if (!fbDb) return null;
+  try {
+    const key  = snapDateKey();
+    const snap = JSON.parse(JSON.stringify(DB));
+    if (snap.settings) { delete snap.settings.firebaseUrl; delete snap.settings.firebaseApiKey; }
+    snap._snapLabel = label || 'auto';
+    snap._snapTime  = new Date().toISOString();
+    snap._snapKey   = key;
+    await fbPut('/snapshots/' + key, snap);
+    if (!Array.isArray(DB.snapshotIndex)) DB.snapshotIndex = [];
+    const existing = DB.snapshotIndex.find(s => s.key === key);
+    if (existing) { existing.time = snap._snapTime; existing.label = snap._snapLabel; }
+    else DB.snapshotIndex.unshift({ key, time:snap._snapTime, label:snap._snapLabel });
+    DB.snapshotIndex = DB.snapshotIndex.slice(0,30);
+    scheduleFirebasePush();
+    renderSnapshotList();
+    return key;
+  } catch(e) { console.error('Snapshot failed:',e); return null; }
+}
+function checkMidnightSnapshot() {
+  if (!currentUser || !isAdmin() || !fbDb) return;
+  const now  = new Date();
+  const hhmm = now.getHours()*60 + now.getMinutes();
+  if (hhmm > 5) return; // only 00:00–00:05
+  const todayKey = snapDateKey();
+  const done = Array.isArray(DB.snapshotIndex) && DB.snapshotIndex.some(s => s.key === todayKey);
+  if (!done) {
+    takeSnapshot('auto').then(key => {
+      if (key) { showToast('📸 Daily snapshot saved', 'success'); addLog('snapshot','Auto snapshot: '+key); }
+    });
+  }
+}
+function takeSnapshotNow() {
+  if (!fbDb) { showToast('Firebase not connected','error'); return; }
+  confirm_('📸','Take Snapshot','Save a snapshot of all current data?', async () => {
+    const key = await takeSnapshot('manual');
+    if (key) { showToast('📸 Snapshot saved: '+key,'success'); addLog('snapshot','Manual snapshot: '+key); }
+    else showToast('Snapshot failed','error');
+  });
+}
+function renderSnapshotList() {
+  const wrap = document.getElementById('snapshotListWrap');
+  if (!wrap) return;
+  const list = Array.isArray(DB.snapshotIndex) ? DB.snapshotIndex : [];
+  if (!list.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:14px;">No snapshots yet. Tap 📸 Snap Now to create one.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(s => {
+    const d   = new Date(s.time);
+    const lbl = s.label === 'manual' ? '🖐 Manual' : '🕛 Auto';
+    const col = s.label === 'manual' ? 'var(--accent2)' : 'var(--gold)';
+    const ts  = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+
+                ' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return `<div style="display:flex;align-items:center;justify-content:space-between;
+                        padding:10px 12px;border-bottom:1px solid var(--border);gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--white);">📅 ${escHtml(s.key)}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">
+          <span style="color:${col};font-weight:600;">${lbl}</span> · ${escHtml(ts)}
+        </div>
+      </div>
+      <button onclick="restoreSnapshot('${escHtml(s.key)}')"
+              class="btn btn-warning btn-xs" style="flex-shrink:0;">↩ Restore</button>
+    </div>`;
+  }).join('');
+}
+function restoreSnapshot(key) {
+  confirm_('⚠️','Restore Snapshot',
+    'Restore ALL data from '+key+'? Current data will be overwritten.',
+    async () => {
+      if (!fbDb) { showToast('Firebase not connected','error'); return; }
+      try {
+        const data = await fbGet('/snapshots/' + key);
+        if (!data) { showToast('Snapshot not found','error'); return; }
+        const savedIndex  = Array.isArray(DB.snapshotIndex) ? [...DB.snapshotIndex] : [];
+        const savedUrl    = DB.settings.firebaseUrl;
+        DB = ensureArrays(data);
+        DB.snapshotIndex        = savedIndex;
+        DB.settings.firebaseUrl = savedUrl;
+        isSyncing = true; pendingPush = false;
+        const toSave = JSON.parse(JSON.stringify(DB));
+        if (toSave.settings) { delete toSave.settings.firebaseUrl; delete toSave.settings.firebaseApiKey; }
+        await fbPut('/sacdb', toSave);
+        isSyncing = false;
+        lastKnownDB = JSON.stringify(data);
+        refreshCurrentPage();
+        showToast('✅ Restored from '+key,'success');
+        addLog('snapshot','Restored from snapshot '+key);
+      } catch(e) { isSyncing=false; showToast('Restore failed: '+e.message,'error'); }
+    });
+}
+
 function ensureArrays(db) {
   // Guarantee top-level keys always exist so nothing can crash reading them
   if (!db.settings   || typeof db.settings !== 'object') db.settings   = {};
@@ -914,7 +1254,7 @@ function ensureArrays(db) {
   if (!db.fees       || typeof db.fees !== 'object')      db.fees       = {};
 
   // Firebase sometimes converts arrays to objects {0:{}, 1:{}} — fix them back
-  ['users','batches','students','changelog'].forEach(key => {
+  ['users','batches','students','changelog','enquiries','snapshotIndex','msgLogs'].forEach(key => {
     if (!db[key]) {
       db[key] = [];  // missing key → safe empty array
     } else if (!Array.isArray(db[key]) && typeof db[key] === 'object') {
@@ -1001,7 +1341,10 @@ function closeModal(id) {
 // ----------------------------------------------------------------
 function updateClock() {
   const now = new Date();
-  document.getElementById('clockTime').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const h24 = now.getHours();
+  const h12 = ((h24 % 12) || 12);
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  document.getElementById('clockTime').textContent = `${pad(h12)}:${pad(now.getMinutes())} ${ampm}`;
   document.getElementById('clockDate').textContent = `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
 }
 
@@ -1047,7 +1390,6 @@ function doLogin() {
   btn.disabled = true;
 
   // Always fetch latest users from Firebase before checking login
-  const fbUrl = DB.settings.firebaseUrl;
   const tryLogin = (usersArr) => {
     const user = usersArr.find(u => u.id === id && u.password === pw);
     if (!user) {
@@ -1076,6 +1418,8 @@ function doLogin() {
     if (loadMsg) loadMsg.textContent = 'Welcome, ' + (user.name || user.id) + '!';
     if (loadSub) loadSub.textContent = 'Fetching latest data from server…';
     document.getElementById('topRoleBadge').textContent = isAdmin() ? 'Admin' : 'Staff';
+    const nameEl = document.getElementById('topUserName');
+    if (nameEl) nameEl.textContent = user.name || user.id;
     applyRoleUI();
     updateLogos();
     addLog('login', 'Logged in');
@@ -1092,37 +1436,17 @@ function doLogin() {
     });
   };
 
-  // Try to fetch users from Firebase first
-  if (fbUrl && typeof firebase !== 'undefined') {
-    try {
-      let tempApp, tempDb;
-      if (!firebase.apps || !firebase.apps.length) {
-        tempApp = firebase.initializeApp({ databaseURL: fbUrl });
+  // Try to fetch users from Firebase REST API first
+  const fbUrl = DB.settings.firebaseUrl;
+  if (fbUrl) {
+    fetchUsersForLogin(fbUrl).then(remoteUsers => {
+      if (remoteUsers && remoteUsers.length) {
+        tryLogin(remoteUsers);
       } else {
-        tempApp = firebase.apps[0];
-      }
-      tempDb = firebase.database(tempApp);
-      tempDb.ref('/sacdb/users').once('value').then(snap => {
-        const remoteUsers = snap.val();
-        if (remoteUsers) {
-          // Convert object-array back to real array if needed
-          const usersArr = Array.isArray(remoteUsers)
-            ? remoteUsers
-            : Object.values(remoteUsers);
-          tryLogin(usersArr);
-        } else {
-          // Firebase has no users yet — fall back to local
-          tryLogin(DB.users);
-        }
-      }).catch(() => {
-        // Firebase unreachable — fall back to local users
         tryLogin(DB.users);
-      });
-    } catch(e) {
-      tryLogin(DB.users);
-    }
+      }
+    }).catch(() => tryLogin(DB.users));
   } else {
-    // No Firebase configured — use local users only
     tryLogin(DB.users);
   }
 }
@@ -1132,7 +1456,8 @@ function doLogout() {
     currentUser = null;
     if (fbPullTimer) { clearInterval(fbPullTimer); fbPullTimer = null; }
     if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
-    if (fbListener && fbDb) { fbDb.ref('/sacdb').off('value', fbListener); fbListener = null; }
+    if (fbListener) { try { fbListener.close(); } catch(e) {} fbListener = null; }
+    fbDb = null;
     document.getElementById('app').classList.remove('active');
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('loginId').value = '';
@@ -1146,83 +1471,240 @@ function applyRoleUI() {
 }
 
 // ----------------------------------------------------------------
-// FIREBASE
+// FIREBASE — Pure REST API (no SDK required, works with any region)
 // ----------------------------------------------------------------
-function initFirebase() {
-  const url = DB.settings.firebaseUrl;
-  if (!url) return Promise.resolve();
-  return new Promise(resolve => {
-    try {
-      if (typeof firebase === 'undefined') return resolve();
-      if (!firebase.apps || !firebase.apps.length) {
-        fbApp = firebase.initializeApp({ databaseURL: url });
-      } else {
-        fbApp = firebase.apps[0];
-      }
-      fbDb = firebase.database(fbApp);
-      const el = document.getElementById('fbStatus');
-      if (el) el.textContent = '🟡 Connecting...';
-      // Pull ALL data from Firebase before showing the app
-      fbDb.ref('/sacdb').once('value').then(snap => {
-        const remote = snap.val();
-        if (remote) {
-          DB = ensureArrays(remote);
-          try { const u = localStorage.getItem('sac_firebaseUrl'); if(u) DB.settings.firebaseUrl = u; } catch(e){}
-          lastKnownDB = JSON.stringify(remote);
-          if (el) el.textContent = '🟢 Connected & pulled latest data';
-        } else {
-          // Firebase is empty — push local data up
-          pendingPush = true;
-          if (el) el.textContent = '🟢 Connected (new database)';
-        }
-        startPull();
-        resolve(); // ← unblock login AFTER data is ready
-      }).catch(e => {
-        if (el) el.textContent = '🔴 ' + e.message;
-        startPull();
-        resolve(); // still unblock — fall back to local data
-      });
-    } catch(e) {
-      const el = document.getElementById('fbStatus');
-      if (el) el.textContent = '🔴 ' + e.message;
-      resolve();
-    }
-  });
+let fbDb = null;        // { baseUrl, ref(path) } shim
+let fbApp = null;       // unused, kept for compat
+let fbListener = null;  // SSE EventSource for real-time
+let fbPullTimer = null; // polling fallback timer
+let pushTimer = null;
+let isSyncing = false;
+let pendingPush = false;
+let lastKnownDB = null;
+
+function fbBaseUrl() {
+  const url = DB.settings.firebaseUrl || '';
+  return url.replace(/\/$/, ''); // strip trailing slash
 }
+
+function fbRestUrl(path) {
+  return fbBaseUrl() + path + '.json';
+}
+
+// GET — fetch data from Firebase REST
+async function fbGet(path) {
+  const res = await fetch(fbRestUrl(path));
+  if (!res.ok) throw new Error('Firebase GET failed: ' + res.status);
+  return res.json();
+}
+
+// PUT — write data to Firebase REST
+async function fbPut(path, data) {
+  const res = await fetch(fbRestUrl(path), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!res.ok) throw new Error('Firebase PUT failed: ' + res.status);
+  return res.json();
+}
+
+function initFirebase() {
+  const url = fbBaseUrl();
+  if (!url) return Promise.resolve();
+
+  // Mark as connected (REST is stateless — always "connected" when URL is set)
+  fbDb = true; // truthy flag so doPush knows Firebase is configured
+  const el = document.getElementById('fbStatus');
+  if (el) el.textContent = '🟡 Connecting...';
+
+  return fbGet('/sacdb')
+    .then(remote => {
+      if (remote) {
+        DB = ensureArrays(remote);
+        try { const u = localStorage.getItem('sac_firebaseUrl'); if (u) DB.settings.firebaseUrl = u; } catch(e) {}
+        lastKnownDB = JSON.stringify(remote);
+        if (el) el.textContent = '🟢 Connected & pulled latest data';
+      } else {
+        pendingPush = true; // empty DB — push local data up
+        if (el) el.textContent = '🟢 Connected (new database)';
+      }
+      startPull();
+    })
+    .catch(e => {
+      if (el) el.textContent = '🔴 ' + e.message;
+      startPull(); // start polling anyway
+    });
+}
+
 function saveFirebaseUrl() {
   const url = document.getElementById('firebaseUrlInput').value.trim();
-  confirm_('🔥','Save Firebase URL','Connect to this Firebase database?', () => {
+  confirm_('🔥', 'Save Firebase URL', 'Connect to this Firebase database?', () => {
     DB.settings.firebaseUrl = url;
-    // Store only the URL in localStorage — it's needed before login to connect
-    try { localStorage.setItem('sac_firebaseUrl', url); } catch(e){}
-    addLog('firebase','Firebase URL updated');
-    initFirebase();
-    showToast('Firebase config saved','success');
+    try { localStorage.setItem('sac_firebaseUrl', url); } catch(e) {}
+    addLog('firebase', 'Firebase URL updated');
+    showToast('Firebase config saved', 'success');
+    initFirebase().then(() => {
+      renderProfilePage();
+      showToast('🟢 Connected!', 'success');
+    });
   });
 }
-function pushToFirebase() {
-  if (!fbDb) { showToast('Firebase not connected','error'); return; }
-  confirm_('⬆️','Manual Push','Push all local data to Firebase now?', () => {
-    isSyncing = true;
-    const manualSnap = JSON.parse(JSON.stringify(DB));
-    if (manualSnap.settings) delete manualSnap.settings.firebaseUrl;
-    fbDb.ref('/sacdb').set(manualSnap).then(() => {
+
+function startPull() {
+  // Cancel any existing timers/listeners
+  if (fbPullTimer) { clearInterval(fbPullTimer); fbPullTimer = null; }
+  if (fbListener) { try { fbListener.close(); } catch(e) {} fbListener = null; }
+  if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
+
+  const url = fbBaseUrl();
+  if (!url) return;
+
+  // ── Try SSE (real-time stream) first ──
+  try {
+    const sseUrl = url + '/sacdb.json';
+    const es = new EventSource(sseUrl);
+    es.addEventListener('put', e => {
+      try {
+        const payload = JSON.parse(e.data);
+        const remote = payload.path === '/' ? payload.data : null;
+        if (!remote || !currentUser || isSyncing || isModalOpen()) return;
+        notifyFirebaseUpdate(remote, false);
+        DB = ensureArrays(remote);
+        try { const u = localStorage.getItem('sac_firebaseUrl'); if (u) DB.settings.firebaseUrl = u; } catch(ex) {}
+        refreshCurrentPage();
+        const st = document.getElementById('fbStatus');
+        if (st) st.textContent = '🟢 Live — updated ' + new Date().toLocaleTimeString();
+      } catch(ex) { /* ignore parse errors */ }
+    });
+    es.onerror = () => {
+      // SSE failed — fall back to polling
+      try { es.close(); } catch(ex) {}
+      fbListener = null;
+      startPolling(url);
+    };
+    fbListener = es;
+    return;
+  } catch(ex) { /* SSE not supported — fall through to polling */ }
+
+  startPolling(url);
+}
+
+function startPolling(url) {
+  // Poll every 5 seconds as fallback
+  fbPullTimer = setInterval(async () => {
+    if (!currentUser || isSyncing || isModalOpen()) return;
+    try {
+      const remote = await fbGet('/sacdb');
+      if (!remote) return;
+      const oldStr = lastKnownDB;
+      const newStr = JSON.stringify(remote);
+      if (oldStr === newStr) return; // no change
+      notifyFirebaseUpdate(remote, false);
+      DB = ensureArrays(remote);
+      try { const u = localStorage.getItem('sac_firebaseUrl'); if (u) DB.settings.firebaseUrl = u; } catch(ex) {}
+      lastKnownDB = newStr;
+      refreshCurrentPage();
+      const st = document.getElementById('fbStatus');
+      if (st) st.textContent = '🟢 Synced — ' + new Date().toLocaleTimeString();
+    } catch(ex) {
+      const st = document.getElementById('fbStatus');
+      if (st) st.textContent = '🟠 Sync error — retrying...';
+    }
+  }, 5000);
+}
+
+function scheduleFirebasePush() {
+  pendingPush = true;
+  if (pushTimer) clearTimeout(pushTimer);
+  pushTimer = setTimeout(doPush, 800);
+}
+
+function doPush() {
+  if (!fbDb || !currentUser || !pendingPush) return;
+  if (isSyncing) {
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(doPush, 1000);
+    return;
+  }
+  isSyncing = true;
+  pendingPush = false;
+  const snapshot = JSON.parse(JSON.stringify(DB));
+  if (snapshot.settings) delete snapshot.settings.firebaseUrl;
+  notifyFirebaseUpdate(snapshot, true);
+  fbPut('/sacdb', snapshot)
+    .then(() => {
       DB.settings.lastPush = new Date().toISOString();
-      DB.settings.lastPushBy = currentUser.id;
-      saveLocal();
-      pendingPush = false;
+      DB.settings.lastPushBy = currentUser ? currentUser.id : '';
+      lastKnownDB = JSON.stringify(snapshot);
+      const st = document.getElementById('fbStatus');
+      if (st) st.textContent = '🟢 Saved to cloud ' + new Date().toLocaleTimeString();
       const el = document.getElementById('lastPushInfo');
-      if (el) el.textContent = `${new Date().toLocaleString()} by ${currentUser.id}`;
-      showToast('Pushed to Firebase ✓','success');
-      addLog('firebase_push','Manual push');
-    }).catch(e => showToast('Push failed: '+e.message,'error'))
+      if (el) el.textContent = new Date().toLocaleString() + ' by ' + (currentUser ? currentUser.id : '');
+    })
+    .catch(() => {
+      pendingPush = true;
+      if (pushTimer) clearTimeout(pushTimer);
+      pushTimer = setTimeout(doPush, 3000);
+      const st = document.getElementById('fbStatus');
+      if (st) st.textContent = '🔴 Save failed — retrying...';
+    })
+    .finally(() => {
+      setTimeout(() => { isSyncing = false; }, 1500);
+    });
+}
+
+function pushToFirebase() {
+  if (!fbDb) { showToast('Firebase not connected', 'error'); return; }
+  confirm_('⬆️', 'Manual Push', 'Push all local data to Firebase now?', () => {
+    isSyncing = true;
+    const snap = JSON.parse(JSON.stringify(DB));
+    if (snap.settings) delete snap.settings.firebaseUrl;
+    fbPut('/sacdb', snap)
+      .then(() => {
+        DB.settings.lastPush = new Date().toISOString();
+        DB.settings.lastPushBy = currentUser.id;
+        pendingPush = false;
+        lastKnownDB = JSON.stringify(snap);
+        const el = document.getElementById('lastPushInfo');
+        if (el) el.textContent = new Date().toLocaleString() + ' by ' + currentUser.id;
+        showToast('Pushed to Firebase ✓', 'success');
+        addLog('firebase_push', 'Manual push');
+      })
+      .catch(e => showToast('Push failed: ' + e.message, 'error'))
       .finally(() => { setTimeout(() => { isSyncing = false; }, 1500); });
   });
 }
-let isSyncing = false;
-let pendingPush = false;
 
-// scheduleFirebasePush is defined below inside the sync section
+function manualPull() {
+  if (!fbDb) { showToast('Firebase not connected', 'error'); return; }
+  fbGet('/sacdb').then(remote => {
+    if (remote) {
+      let savedUrl = null;
+      try { savedUrl = localStorage.getItem('sac_firebaseUrl'); } catch(e) {}
+      DB = ensureArrays(remote);
+      if (savedUrl) DB.settings.firebaseUrl = savedUrl;
+      lastKnownDB = JSON.stringify(remote);
+      refreshCurrentPage();
+      showToast('Data pulled from Firebase ✓', 'success');
+    } else {
+      showToast('No data on Firebase', 'error');
+    }
+  }).catch(e => showToast('Pull failed: ' + e.message, 'error'));
+}
+
+// Login: fetch users from Firebase REST before checking credentials
+function fetchUsersForLogin(fbUrl) {
+  const base = fbUrl.replace(/\/$/, '');
+  return fetch(base + '/sacdb/users.json')
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (!data) return null;
+      return Array.isArray(data) ? data : Object.values(data);
+    })
+    .catch(() => null);
+}
+
 
 function isModalOpen() {
   const inputModals = ['modalStudent','modalFee','modalUser','modalAddBatch','modalNote','modalImport'];
@@ -1292,102 +1774,57 @@ function smartMerge(local, remote) {
   return result;
 }
 
-let fbListener = null; // real-time Firebase listener
-let pushTimer = null;  // debounce timer for pushing local changes
 
-// ----------------------------------------------------------------
-// SYNC NOTIFICATION BANNER
-// ----------------------------------------------------------------
 let syncBannerTimer = null;
-let lastKnownDB = null; // snapshot before merge to detect what changed
 
 function showSyncBanner(icon, title, detail, isPush) {
   const banner = document.getElementById('syncBanner');
-  const iconEl = document.getElementById('syncBannerIcon');
-  const titleEl = document.getElementById('syncBannerTitle');
-  const detailEl = document.getElementById('syncBannerDetail');
-  const timeEl = document.getElementById('syncBannerTime');
   if (!banner) return;
-
-  iconEl.textContent = icon;
+  document.getElementById('syncBannerIcon').textContent = icon;
+  const titleEl = document.getElementById('syncBannerTitle');
   titleEl.textContent = title;
   titleEl.className = 'sync-banner-title' + (isPush ? ' push-title' : '');
-  detailEl.textContent = detail;
-  timeEl.textContent = 'at ' + new Date().toLocaleTimeString();
+  document.getElementById('syncBannerDetail').textContent = detail;
+  document.getElementById('syncBannerTime').textContent = 'at ' + new Date().toLocaleTimeString();
   banner.style.borderColor = isPush ? 'var(--green)' : 'var(--accent2)';
-
-  // Reset animation
   banner.classList.remove('show');
   void banner.offsetWidth;
   banner.classList.add('show');
-
-  // Auto-hide after 4 seconds
   clearTimeout(syncBannerTimer);
-  syncBannerTimer = setTimeout(() => {
-    banner.classList.remove('show');
-  }, 4000);
+  syncBannerTimer = setTimeout(() => banner.classList.remove('show'), 4000);
 }
 
 function detectChanges(oldDB, newDB) {
   const changes = [];
-
-  // Students
-  const oldStudents = (oldDB.students || []);
-  const newStudents = (newDB.students || []);
-  const addedStudents = newStudents.filter(s => !oldStudents.find(o => o.id === s.id));
-  const removedStudents = oldStudents.filter(s => !newStudents.find(n => n.id === s.id));
-  const editedStudents = newStudents.filter(ns => {
-    const os = oldStudents.find(o => o.id === ns.id);
-    return os && JSON.stringify(os) !== JSON.stringify(ns);
-  });
-  if (addedStudents.length) changes.push('➕ ' + addedStudents.length + ' student(s) added');
-  if (removedStudents.length) changes.push('🗑️ ' + removedStudents.length + ' student(s) removed');
-  if (editedStudents.length) changes.push('✏️ ' + editedStudents.length + ' student(s) updated');
-
-  // Attendance
-  const oldAtt = oldDB.attendance || {};
-  const newAtt = newDB.attendance || {};
+  const oldStudents = oldDB.students || [], newStudents = newDB.students || [];
+  const added   = newStudents.filter(s => !oldStudents.find(o => o.id === s.id));
+  const removed = oldStudents.filter(s => !newStudents.find(n => n.id === s.id));
+  const edited  = newStudents.filter(ns => { const os = oldStudents.find(o => o.id === ns.id); return os && JSON.stringify(os) !== JSON.stringify(ns); });
+  if (added.length)   changes.push('➕ ' + added.length + ' student(s) added');
+  if (removed.length) changes.push('🗑️ ' + removed.length + ' student(s) removed');
+  if (edited.length)  changes.push('✏️ ' + edited.length + ' student(s) updated');
+  const oldAtt = oldDB.attendance || {}, newAtt = newDB.attendance || {};
   const attDates = new Set([...Object.keys(oldAtt), ...Object.keys(newAtt)]);
   let attChanges = 0;
-  attDates.forEach(date => {
-    if (JSON.stringify(oldAtt[date] || {}) !== JSON.stringify(newAtt[date] || {})) attChanges++;
-  });
+  attDates.forEach(d => { if (JSON.stringify(oldAtt[d]||{}) !== JSON.stringify(newAtt[d]||{})) attChanges++; });
   if (attChanges) changes.push('📅 Attendance updated (' + attChanges + ' day' + (attChanges > 1 ? 's' : '') + ')');
-
-  // Fees
-  const oldFees = oldDB.fees || {};
-  const newFees = newDB.fees || {};
+  const oldFees = oldDB.fees || {}, newFees = newDB.fees || {};
   const feeMonths = new Set([...Object.keys(oldFees), ...Object.keys(newFees)]);
   let feeChanges = 0;
-  feeMonths.forEach(month => {
-    if (JSON.stringify(oldFees[month] || {}) !== JSON.stringify(newFees[month] || {})) feeChanges++;
-  });
+  feeMonths.forEach(m => { if (JSON.stringify(oldFees[m]||{}) !== JSON.stringify(newFees[m]||{})) feeChanges++; });
   if (feeChanges) changes.push('💰 Fees updated (' + feeChanges + ' month' + (feeChanges > 1 ? 's' : '') + ')');
-
-  // Settings (profile)
-  const oldSettings = oldDB.settings || {};
-  const newSettings = newDB.settings || {};
-  const settingKeys = ['academyName', 'email', 'phone', 'tagline', 'logoUrl'];
-  const settingChanged = settingKeys.some(k => oldSettings[k] !== newSettings[k]);
-  if (settingChanged) changes.push('🏫 Academy profile updated');
-
-  // Batches
-  if (JSON.stringify(oldDB.batches || []) !== JSON.stringify(newDB.batches || [])) {
-    changes.push('📦 Batches updated');
-  }
-
+  const sk = ['academyName','email','phone','tagline','logoUrl'];
+  if (sk.some(k => (oldDB.settings||{})[k] !== (newDB.settings||{})[k])) changes.push('🏫 Academy profile updated');
+  if (JSON.stringify(oldDB.batches||[]) !== JSON.stringify(newDB.batches||[])) changes.push('📦 Batches updated');
   return changes;
 }
 
 function notifyFirebaseUpdate(remote, isPush) {
   const oldDB = lastKnownDB ? JSON.parse(lastKnownDB) : null;
   lastKnownDB = JSON.stringify(remote);
-
-  if (!oldDB) return; // first load — no diff to show
-
+  if (!oldDB) return;
   const changes = detectChanges(oldDB, remote);
-  if (!changes.length) return; // nothing meaningful changed
-
+  if (!changes.length) return;
   if (isPush) {
     showSyncBanner('☁️', 'Saved to Cloud', changes.join(' · '), true);
   } else {
@@ -1397,109 +1834,7 @@ function notifyFirebaseUpdate(remote, isPush) {
   }
 }
 
-function startPull() {
-  // Cancel any existing listener and timers
-  if (fbListener) { fbDb.ref('/sacdb').off('value', fbListener); fbListener = null; }
-  if (fbPullTimer) { clearInterval(fbPullTimer); fbPullTimer = null; }
-  if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; }
 
-  // ── Real-time listener: fires INSTANTLY when Firebase data changes ──
-  // This means your friend sees your changes in under 1 second
-  fbListener = fbDb.ref('/sacdb').on('value', snap => {
-    const remote = snap.val();
-    if (!remote || !currentUser) return;
-
-    // Skip if WE are currently pushing — avoid overwriting our own in-flight data
-    if (isSyncing) return;
-
-    // Skip if a modal/form is open — don't disrupt user mid-edit
-    if (isModalOpen()) return;
-
-    // Directly assign Firebase data — no local data to merge with
-    notifyFirebaseUpdate(remote, false);
-    DB = ensureArrays(remote);
-    // Preserve device-only settings
-    if (DB.settings && currentUser) {
-      const fbUrl = DB.settings.firebaseUrl || DB.settings.firebaseUrl;
-      try { const u = localStorage.getItem('sac_firebaseUrl'); if(u) DB.settings.firebaseUrl = u; } catch(e){}
-    }
-    refreshCurrentPage();
-
-    const st = document.getElementById('fbStatus');
-    if (st) st.textContent = '🟢 Live — updated ' + new Date().toLocaleTimeString();
-    const ind = document.getElementById('syncIndicator');
-    if (ind) ind.textContent = '🔄 Received update at ' + new Date().toLocaleTimeString();
-
-  }, err => {
-    const st = document.getElementById('fbStatus');
-    if (st) st.textContent = '🔴 Connection lost — retrying...';
-  });
-}
-
-// Called after every local data change — debounced to avoid rapid-fire pushes
-function doPush() {
-  if (!fbDb || !currentUser || !pendingPush) return;
-  if (isSyncing) {
-    // Retry after a short delay
-    if (pushTimer) clearTimeout(pushTimer);
-    pushTimer = setTimeout(doPush, 1000);
-    return;
-  }
-  isSyncing = true;
-  pendingPush = false;
-  const snapshot = JSON.parse(JSON.stringify(DB)); // snapshot to push
-  // Don't store device-specific firebaseUrl in the cloud
-  if (snapshot.settings) delete snapshot.settings.firebaseUrl;
-  notifyFirebaseUpdate(snapshot, true); // show what WE are pushing BEFORE it goes up
-  fbDb.ref('/sacdb').set(snapshot).then(() => {
-    DB.settings.lastPush = new Date().toISOString();
-    DB.settings.lastPushBy = currentUser ? currentUser.id : '';
-    saveLocalOnly();
-    lastKnownDB = JSON.stringify(snapshot); // update baseline so our own echo is not re-notified
-    const st = document.getElementById('fbStatus');
-    if (st) st.textContent = '🟢 Saved to cloud ' + new Date().toLocaleTimeString();
-    const el = document.getElementById('lastPushInfo');
-    if (el) el.textContent = new Date().toLocaleString() + ' by ' + (currentUser ? currentUser.id : '');
-  }).catch(() => {
-    pendingPush = true; // retry
-    if (pushTimer) clearTimeout(pushTimer);
-    pushTimer = setTimeout(doPush, 3000);
-    const st = document.getElementById('fbStatus');
-    if (st) st.textContent = '🔴 Save failed — retrying...';
-  }).finally(() => {
-    // Keep isSyncing true for 1.5s after push so listener ignores our own echo
-    setTimeout(() => { isSyncing = false; }, 1500);
-  });
-}
-
-// Override scheduleFirebasePush to use debounced push
-function scheduleFirebasePush() {
-  pendingPush = true;
-  if (pushTimer) clearTimeout(pushTimer);
-  pushTimer = setTimeout(doPush, 800); // push 800ms after last change
-}
-
-function manualPull() {
-  if (!fbDb) { showToast('Firebase not connected','error'); return; }
-  fbDb.ref('/sacdb').once('value').then(snap => {
-    const remote = snap.val();
-    if (remote) {
-      // Preserve the device-level Firebase URL before overwriting DB
-      let savedUrl = null;
-      try { savedUrl = localStorage.getItem('sac_firebaseUrl'); } catch(e){}
-      DB = ensureArrays(remote);
-      if (savedUrl) DB.settings.firebaseUrl = savedUrl;
-      // Keep lastKnownDB in sync so the real-time listener doesn't fire a stale diff
-      lastKnownDB = JSON.stringify(remote);
-      refreshCurrentPage();
-      showToast('Data pulled from Firebase ✓','success');
-    } else { showToast('No data on Firebase','error'); }
-  }).catch(e => showToast('Pull failed: '+e.message,'error'));
-}
-
-// ----------------------------------------------------------------
-// PAGE SWITCHING
-// ----------------------------------------------------------------
 function switchPage(name) {
   currentPage = name;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1512,6 +1847,7 @@ function switchPage(name) {
   if (name === 'students') { renderBatchChips('student'); renderStudentList(); }
   if (name === 'attendance') { renderBatchChips('att'); renderAttendance(); }
   if (name === 'fees') { renderBatchChips('fee'); renderFees(); }
+  if (name === 'enquiry') renderEnquiryList();
   if (name === 'profile') renderProfilePage();
 }
 function refreshCurrentPage() {
@@ -2860,6 +3196,12 @@ function renderFees() {
     const entry = feeData[s.id] || {};
     const paid  = isPaid(entry);
     const joinedMid = s.joinDate && parseDate(s.joinDate) && parseDate(s.joinDate) > new Date(fy, fm-1, 1);
+    // Message sent info
+    const msgSentArr = entry.msgSent || [];
+    const lastMsg = msgSentArr.length ? msgSentArr[msgSentArr.length-1] : null;
+    const msgSentHtml = lastMsg
+      ? `<span class="${lastMsg.type==='whatsapp'?'msg-whatsapp-badge':'msg-sent-badge'}" style="margin-left:4px;">${lastMsg.type==='whatsapp'?'💬 WA':'📱 SMS'} sent by ${escHtml(lastMsg.by)}</span>`
+      : '';
     if (mode === 'noatt') {
       return `<div class="fee-row" style="opacity:.6;">
         <div style="flex:1;min-width:0;">
@@ -2871,7 +3213,7 @@ function renderFees() {
     }
     return `<div class="fee-row" style="border-left:3px solid ${paid?'#22c55e':'#ef4444'};padding-left:9px;">
       <div style="flex:1;min-width:0;">
-        <div class="fee-name">${escHtml(s.name)}${joinedMid?` <span style="font-size:9px;color:var(--gold);">Joined ${s.joinDate}</span>`:''}</div>
+        <div class="fee-name">${escHtml(s.name)}${joinedMid?` <span style="font-size:9px;color:var(--gold);">Joined ${s.joinDate}</span>`:''}${!paid?msgSentHtml:''}</div>
         <div style="font-size:10px;color:var(--gray);">${escHtml(s.batch||'')}${s.contact?` · <a href="tel:${s.contact}" style="color:var(--accent2);">${s.contact}</a>`:''}</div>
         ${entry.amount?`<div style="font-size:11px;color:${paid?'#4ade80':'var(--graydk)'};margin-top:2px;font-weight:${paid?'600':'400'};">
           ${paid
@@ -2883,6 +3225,7 @@ function renderFees() {
         </div>`:''}
       </div>
       <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+        ${!paid && s.contact ? `<button class="btn btn-xs" style="background:#25d366;color:#fff;" onclick="openSendMsgModal('${s.id}','${fk}')" title="Send fee reminder">💬</button>` : ''}
         <button class="btn btn-primary btn-xs" onclick="openFeeModal('${s.id}')" style="white-space:nowrap;${paid&&!isAdmin()?'opacity:.6;':''}">
           ${entry.by && !isAdmin() ? '🔒 Paid' : paid ? '✏️ Edit' : '💳 Pay'}
         </button>
@@ -2903,9 +3246,11 @@ function renderFees() {
   if (statusFilter !== 'paid') {
     let unpaidHtml = unpaidStudents.map(s => feeRow(s,'unpaid')).join('');
     html += `<div style="margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
         <div style="height:2px;flex:1;background:#ef444433;border-radius:2px;"></div>
         <span style="font-size:11px;font-weight:700;color:#f87171;white-space:nowrap;">❌ NOT PAID — ${unpaidStudents.length} students</span>
+
+        ${isAdmin() ? `<button class="btn btn-xs btn-outline" style="flex-shrink:0;" onclick="openMsgTemplateModal()">✏️ Msg Template</button>` : ''}
         <div style="height:2px;flex:1;background:#ef444433;border-radius:2px;"></div>
       </div>
       <div style="background:var(--card);border:1px solid #ef444433;border-radius:var(--radius);overflow:hidden;">
@@ -2947,8 +3292,138 @@ function renderFees() {
 }
 
 // ----------------------------------------------------------------
-// DASHBOARD
+// FEE REMINDER MESSAGE
 // ----------------------------------------------------------------
+let _sendMsgStudId = null, _sendMsgMonth = null;
+
+function openSendAllMsgModal(fk) {
+  // Opens a WhatsApp-style send for all unpaid students who have a contact
+  const [fy, fm] = fk.split('-').map(Number);
+  const monthLabel = MONTHS[fm-1] + ' ' + fy;
+  const feeData = DB.fees[fk] || {};
+  let students = getActiveStudents();
+  if (selectedBatch.fee !== 'ALL') students = students.filter(s => s.batch === selectedBatch.fee);
+  const eligible = students.filter(s => isEnrolledOnDate(s, fy, fm, 0) && studentAttendedMonth(s.id, fy, fm));
+  const unpaid = eligible.filter(s => !isPaid(feeData[s.id]) && s.contact);
+  if (!unpaid.length) { showToast('No unpaid students with contact numbers', 'error'); return; }
+  confirm_('💬', 'Send All Reminders',
+    `Send fee reminder to ${unpaid.length} unpaid student(s) via WhatsApp?`,
+    () => {
+      unpaid.forEach((s, i) => {
+        setTimeout(() => {
+          const msg = buildFeeMsg(s.name, monthLabel);
+          const phone = s.contact.replace(/\D/g, '');
+          window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+          // Log
+          const sentBy = currentUser.name || currentUser.id;
+          const sentAt = new Date().toISOString();
+          if (!DB.msgLogs) DB.msgLogs = [];
+          DB.msgLogs.unshift({ type: 'whatsapp', to: s.name, contact: s.contact, month: monthLabel, by: sentBy, at: sentAt, msg });
+          if (!DB.fees[fk]) DB.fees[fk] = {};
+          if (!DB.fees[fk][s.id]) DB.fees[fk][s.id] = {};
+          if (!DB.fees[fk][s.id].msgSent) DB.fees[fk][s.id].msgSent = [];
+          DB.fees[fk][s.id].msgSent.push({ type: 'whatsapp', by: sentBy, at: sentAt });
+        }, i * 600);
+      });
+      setTimeout(() => {
+        scheduleFirebasePush();
+        addLog('message', `Bulk fee reminder (WhatsApp) sent to ${unpaid.length} students for ${monthLabel}`);
+        renderFees();
+        showToast(`Reminders sent to ${unpaid.length} students ✓`, 'success');
+      }, unpaid.length * 600 + 200);
+    });
+}
+
+
+function getDefaultMsgTemplate() {
+  return DB.settings.msgTemplate ||
+    'Dear {name}, your fee for {month} is pending at {academy}. Kindly pay at the earliest. Thank you.';
+}
+
+function buildFeeMsg(studentName, monthLabel) {
+  return getDefaultMsgTemplate()
+    .replace(/{name}/g, studentName)
+    .replace(/{month}/g, monthLabel)
+    .replace(/{academy}/g, DB.settings.academyName || 'Academy');
+}
+
+function openMsgTemplateModal() {
+  if (!isAdmin()) { showToast('Only admin can edit the message template.', 'error'); return; }
+  document.getElementById('msgTemplateInput').value = getDefaultMsgTemplate();
+  openModal('modalMsgTemplate');
+}
+
+function saveProfileMsgTemplate() {
+  if (!isAdmin()) { showToast('Only admin can edit the message template.', 'error'); return; }
+  const val = (document.getElementById('profileMsgTemplate').value || '').trim();
+  if (!val) { showToast('Template cannot be empty', 'error'); return; }
+  DB.settings.msgTemplate = val;
+  scheduleFirebasePush();
+  addLog('settings', 'Fee reminder message template updated');
+  showToast('Template saved ✓', 'success');
+}
+
+function saveMsgTemplate() {
+  const val = document.getElementById('msgTemplateInput').value.trim();
+  if (!val) { showToast('Template cannot be empty', 'error'); return; }
+  DB.settings.msgTemplate = val;
+  scheduleFirebasePush();
+  addLog('settings', 'Fee reminder message template updated');
+  closeModal('modalMsgTemplate');
+  showToast('Template saved ✓', 'success');
+}
+
+function openSendMsgModal(sid, fk) {
+  const s = DB.students.find(x => x.id === sid);
+  if (!s) return;
+  _sendMsgStudId = sid; _sendMsgMonth = fk;
+  const [fy, fm] = fk.split('-').map(Number);
+  const monthLabel = MONTHS[fm-1] + ' ' + fy;
+  document.getElementById('sendMsgStudentInfo').innerHTML =
+    `<b>${escHtml(s.name)}</b> · ${escHtml(s.batch||'')}` +
+    (s.contact ? ` · <span style="color:var(--accent2);">📞 ${escHtml(s.contact)}</span>` : ' · <span style="color:var(--gray);">No contact</span>');
+  document.getElementById('sendMsgText').value = buildFeeMsg(s.name, monthLabel);
+  const hasTel = !!s.contact;
+  document.getElementById('btnSendSMS').style.opacity = hasTel ? '1' : '0.5';
+  document.getElementById('btnSendWhatsApp').style.opacity = hasTel ? '1' : '0.5';
+  openModal('modalSendMsg');
+}
+
+function sendFeeMsg(type) {
+  const s = DB.students.find(x => x.id === _sendMsgStudId);
+  if (!s) return;
+  const msgText = document.getElementById('sendMsgText').value.trim();
+  if (!msgText) { showToast('Message cannot be empty', 'error'); return; }
+  if (!s.contact) { showToast('No contact number for this student', 'error'); return; }
+  const phone = s.contact.replace(/\D/g, '');
+  if (type === 'whatsapp') {
+    window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(msgText), '_blank');
+  } else {
+    window.open('sms:' + s.contact + '?body=' + encodeURIComponent(msgText), '_blank');
+  }
+  // Log the sent message
+  const [fy, fm] = _sendMsgMonth.split('-').map(Number);
+  const monthLabel = MONTHS[fm-1] + ' ' + fy;
+  const sentBy = currentUser.name || currentUser.id;
+  const sentAt = new Date().toISOString();
+  const logEntry = { type, to: s.name, contact: s.contact, month: monthLabel, by: sentBy, at: sentAt, msg: msgText };
+  if (!DB.msgLogs) DB.msgLogs = [];
+  DB.msgLogs.unshift(logEntry);
+  if (DB.msgLogs.length > 200) DB.msgLogs.length = 200;
+  // Save on fee entry that a message was sent
+  const fk = _sendMsgMonth;
+  if (!DB.fees[fk]) DB.fees[fk] = {};
+  if (!DB.fees[fk][_sendMsgStudId]) DB.fees[fk][_sendMsgStudId] = {};
+  if (!DB.fees[fk][_sendMsgStudId].msgSent) DB.fees[fk][_sendMsgStudId].msgSent = [];
+  DB.fees[fk][_sendMsgStudId].msgSent.push({ type, by: sentBy, at: sentAt });
+  scheduleFirebasePush();
+  addLog('message', `Fee reminder sent (${type}) to ${s.name} for ${monthLabel}`);
+  closeModal('modalSendMsg');
+  renderFees();
+  showToast('Message opened ✓', 'success');
+}
+
+
 function updateDashNavLabel() {
   const mSel = document.getElementById('dashMonth');
   const ySel = document.getElementById('dashYear');
@@ -3205,7 +3680,10 @@ function renderProfilePage() {
     renderBatchList();
     renderUserList();
     renderChangeLog();
+    renderSnapshotList();
     document.getElementById('staffLogCard').style.display = 'none';
+    const msgTplEl = document.getElementById('profileMsgTemplate');
+    if (msgTplEl) msgTplEl.value = getDefaultMsgTemplate();
   } else {
     // Staff: show only their own log
     const staffLogCard = document.getElementById('staffLogCard');
@@ -3218,6 +3696,34 @@ function renderProfilePage() {
         : `<div style="color:var(--gray);font-size:12px;padding:8px;">No activity yet.</div>`;
     }
   }
+  renderMsgLog();
+}
+
+function renderMsgLog() {
+  const wrap = document.getElementById('msgLogWrap');
+  if (!wrap) return;
+  const logs = Array.isArray(DB.msgLogs) ? DB.msgLogs : [];
+  // Admin sees all; staff sees only their own
+  const visible = isAdmin() ? logs : logs.filter(l => l.by === (currentUser.name || currentUser.id));
+  if (!visible.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:14px;">No messages sent yet.</div>';
+    return;
+  }
+  wrap.innerHTML = visible.slice(0, 80).map(l => {
+    const d = new Date(l.at);
+    const timeStr = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${((d.getHours()%12)||12)}:${pad(d.getMinutes())} ${d.getHours()>=12?'PM':'AM'}`;
+    const badge = l.type === 'whatsapp'
+      ? `<span class="msg-whatsapp-badge">💬 WhatsApp</span>`
+      : `<span class="msg-sent-badge">📱 SMS</span>`;
+    return `<div class="msg-log-row">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        ${badge}
+        <span style="font-size:12px;font-weight:600;">${escHtml(l.to)}</span>
+        <span style="font-size:11px;color:var(--gray);">${escHtml(l.month)}</span>
+      </div>
+      <div class="msg-log-meta">Sent by <b style="color:var(--gold);">${escHtml(l.by)}</b> · ${escHtml(timeStr)} · 📞 ${escHtml(l.contact||'')}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderAdminNameField() {
@@ -3545,6 +4051,11 @@ function changeLogo(e) {
   };
   reader.readAsDataURL(file);
 }
+function refreshProfileMsgField() {
+  const el = document.getElementById('profileMsgTemplate');
+  if (el) el.value = getDefaultMsgTemplate();
+}
+
 function updateLogos() {
   const url = DB.settings.logoUrl;
   ['topLogo','profileLogo','profileLogoEdit'].forEach(id => {
@@ -3712,6 +4223,7 @@ initFontSize();
 
 setInterval(updateClock, 1000);
 updateClock();
+setInterval(checkMidnightSnapshot, 60000);
 
 // Close modals on overlay tap
 document.querySelectorAll('.modal-overlay').forEach(el => {
