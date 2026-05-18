@@ -1,0 +1,11 @@
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBwte6f0d0m5ivE2UpdWu2dnbWFkdqrgdM",
+  authDomain: "meelkazhani-silambam-academy.firebaseapp.com",
+  databaseURL: "https://meelkazhani-silambam-academy-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "meelkazhani-silambam-academy",
+  storageBucket: "meelkazhani-silambam-academy.firebasestorage.app",
+  messagingSenderId: "338928841762",
+  appId: "1:338928841762:web:aebefe53d5c4c317a9867b",
+  measurementId: "G-ZYG6J1HFK7"
+};
