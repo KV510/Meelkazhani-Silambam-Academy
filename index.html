@@ -563,12 +563,6 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         </div>
       </div>
 
-      <!-- SEARCH + FILTER BAR -->
-      <div class="search-wrap">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" class="search-input" placeholder="Search by name, contact or parent…" id="studentSearch" oninput="renderStudentList()">
-      </div>
-
       <!-- ADVANCED FILTERS (collapsible) -->
       <div style="margin-bottom:8px;">
         <button onclick="toggleStudentFilter()" id="studentFilterToggleBtn"
@@ -591,6 +585,12 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         </div>
       </div>
 
+      <!-- SEARCH -->
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" placeholder="Search by name, contact or parent…" id="studentSearch" oninput="renderStudentList()">
+      </div>
+
       <div class="batch-chips" id="studentBatchChips"></div>
 
       <!-- MULTI-SELECT TOOLBAR -->
@@ -603,7 +603,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         <button class="btn btn-xs btn-gold" onclick="openBulkEditModal()" style="font-size:11px;">✏️ Bulk Edit</button>
       </div>
 
-      <div id="studentListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:8px;"></div>
+      <div id="studentListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:72px;"></div>
     </div>
 
     <!-- ===== ATTENDANCE ===== -->
@@ -635,72 +635,64 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         </div>
       </div>
 
-      <!-- Date navigator — Row 1: Date | Month | Year -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;margin-bottom:8px;">
-        <!-- Hidden selects for JS value storage -->
-        <select id="attYear"  onchange="onAttFilterChange()" style="display:none;"></select>
-        <select id="attMonth" onchange="onAttFilterChange()" style="display:none;"></select>
-        <!-- Row 1: DD | MMM -->
-        <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;">
-          <!-- Date segment -->
-          <button class="arrow-btn" onclick="navAtt('date',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
-          <select id="attDate" onchange="onAttFilterChange()"
-            style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1;cursor:pointer;"></select>
-          <button class="arrow-btn" onclick="navAtt('date',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
-          <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
-          <!-- Month segment -->
-          <button class="arrow-btn" onclick="navAtt('month',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
-          <select id="attMonthDisplay" onchange="onAttMonthDisplayChange()"
-            style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1.5;cursor:pointer;"></select>
-          <button class="arrow-btn" onclick="navAtt('month',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
-          <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
-          <!-- Year segment — hidden nav, year still controlled via month overflow -->
-          <button class="arrow-btn" onclick="navAtt('year',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
-          <select id="attYearDisplay" onchange="onAttYearDisplayChange()"
-            style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1;cursor:pointer;"></select>
-          <button class="arrow-btn" onclick="navAtt('year',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
-        </div>
-        <!-- Row 2: View type buttons -->
-        <div style="display:flex;gap:6px;">
-          <button id="attViewDay" onclick="setAttView('day')"
-            style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--accent2);background:var(--accent2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📅 Day</button>
-          <button id="attViewMonth" onclick="setAttView('month')"
-            style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;">📆 Month</button>
-          <button id="attViewYear" onclick="setAttView('year')"
-            style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;">🗓️ Year</button>
-          <select id="attViewType" onchange="renderAttendance()" style="display:none;">
-            <option value="day">Day</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-          </select>
+      <!-- Date navigator — collapsible -->
+      <div style="margin-bottom:8px;">
+        <button onclick="toggleAttDateNav()" id="attDateNavToggleBtn"
+          style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;transition:border-color .2s;">
+          <span style="display:flex;align-items:center;gap:6px;">
+            📅 <span id="attDateNavLabel2" style="color:var(--gold);">— —</span>
+            <span id="attViewBadge" style="background:var(--accent2);color:#fff;border-radius:5px;padding:1px 7px;font-size:10px;font-weight:700;">Day</span>
+          </span>
+          <span id="attDateNavChevron" style="font-size:11px;color:var(--gray);transition:transform .2s;">▼</span>
+        </button>
+        <div id="attDateNavBody" style="display:none;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:10px;">
+          <!-- Hidden selects for JS value storage -->
+          <select id="attYear"  onchange="onAttFilterChange()" style="display:none;"></select>
+          <select id="attMonth" onchange="onAttFilterChange()" style="display:none;"></select>
+          <!-- Row 1: Date | Month | Year -->
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+            <button class="arrow-btn" onclick="navAtt('date',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
+            <select id="attDate" onchange="onAttFilterChange()"
+              style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1;cursor:pointer;"></select>
+            <button class="arrow-btn" onclick="navAtt('date',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
+            <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
+            <button class="arrow-btn" onclick="navAtt('month',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
+            <select id="attMonthDisplay" onchange="onAttMonthDisplayChange()"
+              style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1.5;cursor:pointer;"></select>
+            <button class="arrow-btn" onclick="navAtt('month',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
+            <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
+            <button class="arrow-btn" onclick="navAtt('year',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
+            <select id="attYearDisplay" onchange="onAttYearDisplayChange()"
+              style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1;cursor:pointer;"></select>
+            <button class="arrow-btn" onclick="navAtt('year',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
+          </div>
+          <!-- Row 2: View type buttons -->
+          <div style="display:flex;gap:6px;">
+            <button id="attViewDay" onclick="setAttView('day')"
+              style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--accent2);background:var(--accent2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📅 Day</button>
+            <button id="attViewMonth" onclick="setAttView('month')"
+              style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;">📆 Month</button>
+            <button id="attViewYear" onclick="setAttView('year')"
+              style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;">🗓️ Year</button>
+            <select id="attViewType" onchange="renderAttendance()" style="display:none;">
+              <option value="day">Day</option>
+              <option value="month">Month</option>
+              <option value="year">Year</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- EXPANDABLE FILTER -->
-      <div style="margin-bottom:8px;">
-        <button onclick="toggleAttFilter()" id="attFilterToggleBtn"
-          style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;transition:border-color .2s;">
-          <span style="display:flex;align-items:center;gap:6px;">
-            <span id="attFilterActiveIndicator" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;"></span>
-            🔽 Filters
-          </span>
-          <span id="attFilterChevron" style="font-size:11px;color:var(--gray);transition:transform .2s;">▼</span>
-        </button>
-        <div id="attFilterBody" style="display:none;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:10px 12px;">
-          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;">
-            <input type="text" class="filter-select" id="attSearch" placeholder="Search by name…" oninput="renderAttendance();updateAttFilterIndicator()" style="flex:1;min-width:120px;">
-            <select class="filter-select" id="attStatusFilter" onchange="renderAttendance();updateAttFilterIndicator()" style="flex:1;min-width:90px;">
-              <option value="all">All Status</option>
-              <option value="present">✅ Present</option>
-              <option value="absent">❌ Absent</option>
-            </select>
-          </div>
-          <button class="btn btn-xs btn-outline" onclick="clearAttFilters()" style="width:100%;justify-content:center;">✕ Clear Filters</button>
-        </div>
+      <!-- Search -->
+      <div class="search-wrap" style="margin-bottom:8px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" placeholder="Search student by name…" id="attSearch" oninput="renderAttendance()">
       </div>
+      <!-- Hidden status filter kept for JS compat -->
+      <select id="attStatusFilter" style="display:none;"><option value="all">All Status</option><option value="present">Present</option><option value="absent">Absent</option></select>
       <div class="batch-chips" id="attBatchChips"></div>
       <div id="attSummaryBar"></div>
-      <div id="attListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:8px;"></div>
+      <div id="attListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:72px;"></div>
     </div>
 
     <!-- ===== FEES ===== -->
@@ -713,47 +705,53 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         </div>
       </div>
 
-      <!-- Fee navigator — Row 1: Month | Year | Status · Row 2: Mode -->
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px 10px;margin-bottom:8px;">
-        <!-- Hidden selects for JS value storage -->
-        <select id="feeMonth"    onchange="renderFees()" style="display:none;"></select>
-        <select id="feeYear"     onchange="renderFees()" style="display:none;"></select>
-        <select id="feeYearOnly" onchange="renderFees()" style="display:none;"></select>
-        <!-- Row 1: Month | Year | Status filter — single line -->
-        <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;">
-          <!-- Month segment (hidden in year mode) -->
-          <span id="feeMonthNavBtns" style="display:contents;">
-            <button class="arrow-btn" onclick="navFee('month',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
-            <select id="feeMonthDisplay" onchange="onFeeMonthDisplayChange()"
-              style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1.5;cursor:pointer;"></select>
-            <button class="arrow-btn" onclick="navFee('month',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
-            <div id="feeMonthDivider" style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
+      <!-- Fee navigator — collapsible -->
+      <div style="margin-bottom:8px;">
+        <button onclick="toggleFeeNav()" id="feeNavToggleBtn"
+          style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;transition:border-color .2s;">
+          <span style="display:flex;align-items:center;gap:6px;">
+            💰 <span id="feeNavLabel2" style="color:var(--gold);">— —</span>
+            <span id="feeModeBadge" style="background:var(--accent2);color:#fff;border-radius:5px;padding:1px 7px;font-size:10px;font-weight:700;">Monthly</span>
           </span>
-          <!-- Year segment -->
-          <button class="arrow-btn" onclick="navFee('year',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
-          <select id="feeYearDisplay" onchange="onFeeYearDisplayChange()"
-            style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1;cursor:pointer;"></select>
-          <button class="arrow-btn" onclick="navFee('year',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
-          <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
-          <!-- Status filter -->
-          <select id="feeStatusFilter" onchange="renderFees()"
-            style="flex:1.2;background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--offwhite);font-size:11px;font-weight:600;padding:5px 3px;outline:none;cursor:pointer;">
-            <option value="all">All</option>
-            <option value="paid">Paid</option>
-            <option value="unpaid">Unpaid</option>
-          </select>
+          <span id="feeNavChevron" style="font-size:11px;color:var(--gray);transition:transform .2s;">▼</span>
+        </button>
+        <div id="feeNavBody" style="display:none;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:10px;">
+          <!-- Hidden selects for JS value storage -->
+          <select id="feeMonth"    onchange="renderFees()" style="display:none;"></select>
+          <select id="feeYear"     onchange="renderFees()" style="display:none;"></select>
+          <select id="feeYearOnly" onchange="renderFees()" style="display:none;"></select>
+          <!-- Row 1: Month | Year | Status filter -->
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+            <span id="feeMonthNavBtns" style="display:contents;">
+              <button class="arrow-btn" onclick="navFee('month',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
+              <select id="feeMonthDisplay" onchange="onFeeMonthDisplayChange()"
+                style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1.5;cursor:pointer;"></select>
+              <button class="arrow-btn" onclick="navFee('month',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
+              <div id="feeMonthDivider" style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
+            </span>
+            <button class="arrow-btn" onclick="navFee('year',-1)" style="width:26px;height:26px;flex-shrink:0;">‹</button>
+            <select id="feeYearDisplay" onchange="onFeeYearDisplayChange()"
+              style="background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--gold);font-size:12px;font-weight:700;padding:5px 3px;text-align:center;outline:none;flex:1;cursor:pointer;"></select>
+            <button class="arrow-btn" onclick="navFee('year',1)" style="width:26px;height:26px;flex-shrink:0;">›</button>
+            <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;"></div>
+            <select id="feeStatusFilter" onchange="renderFees()"
+              style="flex:1.2;background:var(--card2);border:1px solid var(--border);border-radius:7px;color:var(--offwhite);font-size:11px;font-weight:600;padding:5px 3px;outline:none;cursor:pointer;">
+              <option value="all">All</option>
+              <option value="paid">Paid</option>
+              <option value="unpaid">Unpaid</option>
+            </select>
+          </div>
+          <!-- Row 2: Mode toggle -->
+          <div style="display:flex;gap:6px;">
+            <button id="feeFilterMonthBtn" onclick="setFeeFilterMode('month')"
+              style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--accent2);background:var(--accent2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📅 Monthly</button>
+            <button id="feeFilterYearBtn" onclick="setFeeFilterMode('year')"
+              style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;">📆 Yearly</button>
+          </div>
+          <select id="feeYearOnlyDisplay" onchange="onFeeYearOnlyDisplayChange()" style="display:none;"></select>
+          <div id="feeMonthFilter" style="display:none;"></div>
+          <div id="feeYearFilter"  style="display:none;"></div>
         </div>
-        <!-- Row 2: Mode toggle buttons -->
-        <div style="display:flex;gap:6px;">
-          <button id="feeFilterMonthBtn" onclick="setFeeFilterMode('month')"
-            style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--accent2);background:var(--accent2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">📅 Monthly</button>
-          <button id="feeFilterYearBtn" onclick="setFeeFilterMode('year')"
-            style="flex:1;padding:6px 0;border-radius:7px;border:1px solid var(--border);background:var(--card2);color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;">📆 Yearly</button>
-        </div>
-        <!-- Keep legacy year-only display select hidden (used by JS) -->
-        <select id="feeYearOnlyDisplay" onchange="onFeeYearOnlyDisplayChange()" style="display:none;"></select>
-        <div id="feeMonthFilter" style="display:none;"></div>
-        <div id="feeYearFilter"  style="display:none;"></div>
       </div>
 
       <div class="search-wrap">
@@ -761,7 +759,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         <input type="text" class="search-input" placeholder="Search student…" id="feeSearch" oninput="renderFees()">
       </div>
       <div class="batch-chips" id="feeBatchChips"></div>
-      <div id="feeListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:8px;"></div>
+      <div id="feeListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:72px;"></div>
     </div>
 
     <!-- ===== ENQUIRY / QUERIES ===== -->
@@ -770,32 +768,61 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         <div class="section-title" style="margin-bottom:0;">💬 Queries</div>
         <button class="btn btn-primary btn-sm" onclick="openAddEnquiryModal()">+ Add</button>
       </div>
-      <!-- Search Bar -->
-      <div class="search-wrap">
+      <!-- Filters — collapsible -->
+      <div style="margin-bottom:8px;">
+        <button onclick="toggleEnquiryFilter()" id="enqFilterToggleBtn"
+          style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--offwhite);font-size:12px;font-weight:700;cursor:pointer;transition:border-color .2s;">
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span id="enqFilterActiveIndicator" style="display:none;width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;"></span>
+            🔽 Filters
+          </span>
+          <span id="enqFilterChevron" style="font-size:11px;color:var(--gray);transition:transform .2s;">▼</span>
+        </button>
+        <div id="enqFilterBody" style="display:none;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:10px 12px;">
+          <div class="filter-row" style="gap:8px;margin-bottom:8px;">
+            <select class="filter-select" id="enqFilterConversion" onchange="renderEnquiryList();updateEnqFilterIndicator()" style="flex:1;">
+              <option value="">All Ratios</option>
+              <option value="High">🔥 High</option>
+              <option value="Medium">⚡ Medium</option>
+              <option value="Low">❄️ Low</option>
+            </select>
+            <input type="date" class="filter-select" id="enqFilterReminderDate" onchange="renderEnquiryList();updateEnqFilterIndicator()" style="flex:1;cursor:pointer;" title="Filter by Reminder Date">
+          </div>
+          <div id="enqStaffFilterRow" class="filter-row" style="gap:8px;margin-bottom:8px;display:none;">
+            <select class="filter-select" id="enqFilterStaff" onchange="renderEnquiryList();updateEnqFilterIndicator()" style="flex:1;">
+              <option value="">👥 All Staff</option>
+            </select>
+          </div>
+          <button class="btn btn-xs btn-outline" onclick="clearEnquiryFilters()" style="width:100%;justify-content:center;">✕ Clear Filters</button>
+        </div>
+      </div>
+      <!-- Search -->
+      <div class="search-wrap" style="margin-bottom:8px;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" class="search-input" placeholder="Search by name or phone…" id="enquirySearch" oninput="renderEnquiryList()">
       </div>
-      <!-- Filters -->
-      <div class="filter-bar" style="margin-bottom:10px;">
-        <div style="font-size:10px;color:var(--gold);font-weight:700;letter-spacing:.5px;margin-bottom:7px;">🔽 FILTERS</div>
-        <div class="filter-row" style="gap:8px;">
-          <select class="filter-select" id="enqFilterConversion" onchange="renderEnquiryList()" style="flex:1;">
-            <option value="">All Ratios</option>
-            <option value="High">🔥 High</option>
-            <option value="Medium">⚡ Medium</option>
-            <option value="Low">❄️ Low</option>
-          </select>
-          <input type="date" class="filter-select" id="enqFilterReminderDate" onchange="renderEnquiryList()" style="flex:1;cursor:pointer;" title="Filter by Reminder Date">
-          <button class="btn btn-xs btn-outline" onclick="clearEnquiryFilters()" title="Clear Filters">✕ Clear</button>
-        </div>
-        <!-- Staff name filter — admin only -->
-        <div id="enqStaffFilterRow" class="filter-row" style="gap:8px;margin-top:6px;display:none;">
-          <select class="filter-select" id="enqFilterStaff" onchange="renderEnquiryList()" style="flex:1;">
-            <option value="">👥 All Staff</option>
-          </select>
-        </div>
-      </div>
       <div id="enquiryListWrap"></div>
+    </div>
+
+    <!-- ===== ACTIVITY LOG ===== -->
+    <div class="page" id="pageActivity">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="section-title" style="margin-bottom:0;">📋 Activity Log</div>
+        <button class="btn btn-primary btn-sm" onclick="openClassLogAddModal()">+ Add</button>
+      </div>
+
+      <!-- Filter row -->
+      <div style="display:flex;gap:6px;margin-bottom:10px;">
+        <select id="classLogFilterBatch" onchange="renderClassLog()" class="form-select" style="flex:1;padding:7px 10px;font-size:12px;">
+          <option value="">All Batches</option>
+        </select>
+        <input type="month" id="classLogFilterMonth" onchange="renderClassLog()" class="form-input" style="flex:1;padding:7px 10px;font-size:12px;">
+      </div>
+
+      <!-- Log List -->
+      <div id="classLogList" style="padding-bottom:72px;">
+        <div class="empty-state" style="padding:20px;">No class entries yet.</div>
+      </div>
     </div>
 
     <!-- ===== PROFILE ===== -->
@@ -803,6 +830,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="section-title" style="margin-bottom:0;">👤 Profile</div>
         <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="openSettingsModal()" title="Settings">⚙️ Settings</button>
           <button class="btn btn-danger btn-sm" onclick="doLogout()">Logout</button>
         </div>
       </div>
@@ -867,49 +895,14 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         </div>
       </div>
 
-      <!-- Firebase -->
-      <div class="card">
-        <div class="section-title" style="font-size:12px;">🔥 Firebase Sync</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:var(--royal2);border-radius:8px;padding:9px 12px;">
-          <span id="fbStatus" style="font-size:12px;color:var(--gray);flex:1;">⚪ Not connected</span>
-        </div>
 
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="manualPull()">⬇️ Pull</button>
-          <button class="btn btn-outline btn-sm" style="flex:1;" id="pushBtn" onclick="pushToFirebase()">⬆️ Push</button>
-        </div>
-        <div style="font-size:11px;color:var(--gray);margin-top:7px;">
-          Auto-sync: every 2s &nbsp;|&nbsp; Last push: <span id="lastPushInfo">Never</span>
-        </div>
-        <div id="syncIndicator" style="font-size:10px;color:var(--graydk);margin-top:3px;"></div>
-      </div>
-
-      <!-- Data Import / Export — Admin only -->
-      <div class="card admin-only" id="dataCard">
-        <div class="section-title" style="font-size:12px;">💾 Data Backup &amp; Restore</div>
-        <div style="font-size:11px;color:var(--gray);margin-bottom:10px;">Export all academy data to a JSON file, or restore from a previously exported file.</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-primary btn-sm" style="flex:1;" onclick="exportAllData()">⬇️ Export Data</button>
-          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="document.getElementById('importDataFile').click()">⬆️ Import Data</button>
-        </div>
-        <input type="file" id="importDataFile" accept=".json" style="display:none" onchange="importAllData(event)">
-        <div id="importDataStatus" style="font-size:11px;margin-top:8px;display:none;"></div>
-      </div>
-
-      <!-- Daily Snapshots — Admin only -->
-      <div class="card admin-only" id="snapshotCard">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <div class="section-title" style="margin-bottom:0;font-size:12px;">📸 Daily Snapshots</div>
-          <button class="btn btn-primary btn-xs" onclick="takeSnapshotNow()">📸 Snap Now</button>
-        </div>
-        <div style="font-size:11px;color:var(--gray);margin-bottom:10px;line-height:1.6;">
-          Auto-snapshot taken once daily (on first login of the day). Last 30 days kept.
-          Tap <b>↩ Restore</b> to recover all data from any snapshot.
-        </div>
-        <div id="snapshotListWrap" style="max-height:300px;overflow-y:auto;">
-          <div class="empty-state" style="padding:14px;">No snapshots yet.</div>
-        </div>
-      </div>
+      <!-- Hidden elements kept for JS compatibility -->
+      <span id="fbStatus" style="display:none;"></span>
+      <span id="lastPushInfo" style="display:none;"></span>
+      <div id="syncIndicator" style="display:none;"></div>
+      <input type="file" id="importDataFile" accept=".json" style="display:none" onchange="importAllData(event)">
+      <div id="importDataStatus" style="display:none;"></div>
+      <div id="snapshotListWrap" style="display:none;"></div>
 
       <!-- Batch Management — Admin only -->
       <div class="card admin-only" id="batchCard">
@@ -1032,6 +1025,10 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span>Queries</span>
     </button>
+    <button class="nav-item" id="nav-activity" onclick="switchPage('activity')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>Activity</span>
+    </button>
     <button class="nav-item" id="nav-profile" onclick="switchPage('profile')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Profile</span>
@@ -1045,6 +1042,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
 <div class="modal-overlay" id="modalStudent">
   <div class="modal">
     <div class="modal-title"><span id="modalStudentTitle">Add Student</span><button class="modal-close" onclick="closeModal('modalStudent')">×</button></div>
+    <input type="hidden" id="sRollNo">
     <div class="form-group"><label class="form-label">Full Name *</label><input type="text" class="form-input" id="sName" placeholder="Student full name"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Date of Birth</label><input type="text" class="form-input" id="sDob" placeholder="DD/MM/YYYY" inputmode="numeric" maxlength="10" oninput="dobAutoFormat(this)" onkeydown="dobKeyDown(event,this)"></div>
@@ -1174,10 +1172,15 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
     <div class="form-group"><label class="form-label">Display Name</label><input type="text" class="form-input" id="newUserName" placeholder="Full name"></div>
     <div class="form-group"><label class="form-label">Password * <span style="color:var(--gray);font-size:10px;">(min 6 characters)</span></label><input type="password" class="form-input" id="newUserPass" placeholder="Set login password"></div>
     <div class="form-group"><label class="form-label">Role</label>
-      <select class="form-select" id="newUserRole">
+      <select class="form-select" id="newUserRole" onchange="toggleBatchAssignField()">
         <option value="admin">Admin</option>
         <option value="staff">Staff</option>
       </select>
+    </div>
+    <div id="batchAssignGroup" style="display:none;">
+      <label class="form-label">Assigned Batches <span style="color:var(--gray);font-size:10px;">(staff sees only these)</span></label>
+      <div id="batchAssignCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:var(--royal2);border-radius:8px;border:1px solid var(--border);"></div>
+      <div style="font-size:11px;color:var(--graydk);margin-top:5px;">Leave all unchecked = staff sees all batches.</div>
     </div>
     <div id="userSaveError" style="display:none;background:#ef444422;border:1px solid #ef4444;border-radius:8px;padding:9px 12px;margin-bottom:10px;font-size:12px;color:#fca5a5;"></div>
     <button class="btn btn-primary" style="width:100%;padding:12px;" id="saveUserBtn" onclick="saveUser()">💾 Save User</button>
@@ -1310,6 +1313,143 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
     </div>
   </div>
 </div>
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="modalSettings">
+  <div class="modal">
+    <div class="modal-title">
+      <span>⚙️ Settings</span>
+      <button class="modal-close" onclick="closeModal('modalSettings')">×</button>
+    </div>
+
+    <!-- Firebase Sync — ALL users -->
+    <div style="margin-bottom:16px;">
+      <div class="section-title" style="font-size:13px;margin-bottom:8px;">🔥 Firebase Sync</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;background:var(--royal2);border-radius:8px;padding:9px 12px;">
+        <span id="fbStatusModal" style="font-size:12px;color:var(--gray);flex:1;">⚪ Not connected</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="settingsPull()">⬇️ Pull</button>
+        <button class="btn btn-outline btn-sm" style="flex:1;" onclick="settingsPush()">⬆️ Push</button>
+      </div>
+      <div style="font-size:11px;color:var(--gray);margin-top:7px;">
+        Auto-sync: every 2s &nbsp;|&nbsp; Last push: <span id="lastPushInfoModal">Never</span>
+      </div>
+    </div>
+
+    <!-- Admin-only section -->
+    <div id="settingsAdminOnly" style="display:none;">
+      <div style="height:1px;background:var(--border);margin:4px 0 16px;"></div>
+
+      <!-- Data Backup & Restore -->
+      <div style="margin-bottom:16px;">
+        <div class="section-title" style="font-size:13px;margin-bottom:6px;">💾 Data Backup &amp; Restore</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:10px;line-height:1.6;">
+          Export all academy data to a JSON file, or restore from a previously exported file.
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" style="flex:1;" onclick="exportAllData()">⬇️ Export Data</button>
+          <button class="btn btn-outline btn-sm" style="flex:1;" onclick="document.getElementById('importDataFileSettings').click()">⬆️ Import Data</button>
+        </div>
+        <input type="file" id="importDataFileSettings" accept=".json" style="display:none" onchange="importAllData(event)">
+        <div id="importDataStatusSettings" style="font-size:11px;margin-top:8px;display:none;color:#4ade80;"></div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:4px 0 16px;"></div>
+
+      <!-- Daily Snapshots -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div class="section-title" style="margin-bottom:0;font-size:13px;">📸 Daily Snapshots</div>
+          <button class="btn btn-primary btn-xs" onclick="takeSnapshotFromSettings()">📸 Snap Now</button>
+        </div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:10px;line-height:1.6;">
+          Auto-snapshot taken once daily (on first login of the day). Last 30 days kept.
+          Tap <b>↩ Restore</b> to recover all data from any snapshot.
+        </div>
+        <div id="snapshotListWrapSettings" style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;">
+          <div class="empty-state" style="padding:14px;">Loading…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOG A CLASS MODAL -->
+<div class="modal-overlay" id="modalClassLogAdd">
+  <div class="modal">
+    <div class="modal-title">
+      <span>➕ Log a Class</span>
+      <button class="modal-close" onclick="closeModal('modalClassLogAdd')">×</button>
+    </div>
+    <div class="form-row" style="margin-bottom:8px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-input" id="classLogDate">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Batch</label>
+        <select class="form-select" id="classLogBatch"></select>
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:8px;">
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">🟢 In Time</label>
+        <input type="time" class="form-input" id="classLogInTime">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">🔴 Out Time</label>
+        <input type="time" class="form-input" id="classLogOutTime">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:12px;">
+      <label class="form-label">What was covered? (optional)</label>
+      <textarea class="form-input" id="classLogNote" rows="3" placeholder="e.g. Warm-up, Silambam basics, Footwork drills…" style="resize:none;"></textarea>
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveClassLog()">💾 Save Entry</button>
+  </div>
+</div>
+
+<!-- ASSIGN BATCH MODAL -->
+<div class="modal-overlay" id="modalAssignBatch">
+  <div class="modal">
+    <div class="modal-title">
+      <span>📦 Assign Batches</span>
+      <button class="modal-close" onclick="closeModal('modalAssignBatch')">×</button>
+    </div>
+    <input type="hidden" id="assignBatchUserId">
+    <div style="background:var(--card2);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+      <div style="font-size:13px;font-weight:700;color:var(--offwhite);" id="assignBatchUserName"></div>
+      <div style="font-size:11px;color:var(--gray);margin-top:2px;" id="assignBatchUserEmail"></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px;line-height:1.6;">
+      Tick the batches this staff can access. Leave all unchecked to allow access to all batches.
+    </div>
+    <div id="assignBatchCheckboxes" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveAssignBatch()">💾 Save Batch Assignment</button>
+  </div>
+</div>
+
+<!-- ASSIGN BATCH MODAL -->
+<div class="modal-overlay" id="modalAssignBatch">
+  <div class="modal">
+    <div class="modal-title">
+      <span>📦 Assign Batches</span>
+      <button class="modal-close" onclick="closeModal('modalAssignBatch')">×</button>
+    </div>
+    <input type="hidden" id="assignBatchUserId">
+    <!-- Staff info -->
+    <div style="background:var(--card2);border-radius:8px;padding:10px 12px;margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:700;color:var(--offwhite);" id="assignBatchUserName"></div>
+      <div style="font-size:11px;color:var(--gray);margin-top:2px;" id="assignBatchUserEmail"></div>
+    </div>
+    <!-- Batch checkboxes -->
+    <div style="font-size:12px;color:var(--gray);margin-bottom:8px;">Select which batches this staff can access:</div>
+    <div id="assignBatchCheckboxes" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <div style="font-size:11px;color:var(--graydk);margin-bottom:14px;">Leave all unchecked = staff can access all batches.</div>
+    <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="saveAssignBatch()">💾 Save Assignment</button>
+  </div>
+</div>
+
 <!-- CONFIRM DIALOG -->
 <div class="confirm-overlay" id="confirmDlg">
   <div class="confirm-box">
@@ -1356,7 +1496,8 @@ let DB = {
   enquiries: [],
   snapshotIndex: [],
   changelog: [],
-  msgLogs: []
+  msgLogs: [],
+  classLog: []
 };
 
 let currentUser = null;
@@ -1419,7 +1560,25 @@ function clearEnquiryFilters() {
   if (cf) cf.value = '';
   if (rf) rf.value = '';
   if (sf) sf.value = '';
+  updateEnqFilterIndicator();
   renderEnquiryList();
+}
+function toggleEnquiryFilter() {
+  const body    = document.getElementById('enqFilterBody');
+  const chevron = document.getElementById('enqFilterChevron');
+  const btn     = document.getElementById('enqFilterToggleBtn');
+  if (!body) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if (chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+  if (btn) btn.style.borderRadius = open ? '10px' : '10px 10px 0 0';
+}
+function updateEnqFilterIndicator() {
+  const cf = document.getElementById('enqFilterConversion')?.value || '';
+  const rf = document.getElementById('enqFilterReminderDate')?.value || '';
+  const sf = document.getElementById('enqFilterStaff')?.value || '';
+  const dot = document.getElementById('enqFilterActiveIndicator');
+  if (dot) dot.style.display = (cf || rf || sf) ? 'inline-block' : 'none';
 }
 
 function conversionBadge(ratio) {
@@ -1925,7 +2084,7 @@ function ensureArrays(db) {
   if (!db.fees       || typeof db.fees !== 'object')      db.fees       = {};
 
   // Firebase sometimes converts arrays to objects {0:{}, 1:{}} — fix them back
-  ['users','batches','students','changelog','enquiries','snapshotIndex','msgLogs'].forEach(key => {
+  ['users','batches','students','changelog','enquiries','snapshotIndex','msgLogs','classLog'].forEach(key => {
     if (!db[key]) {
       db[key] = [];  // missing key → safe empty array
     } else if (!Array.isArray(db[key]) && typeof db[key] === 'object') {
@@ -2242,11 +2401,51 @@ function launchApp() {
   if (overlay) overlay.classList.remove('active');
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('app').classList.add('active');
+
+  // Migrate: assign roll numbers to existing students that don't have one
+  migrateRollNumbers();
+
+  // Apply batch restriction for staff
+  const staffBatches = getStaffBatches();
+  if (staffBatches.length > 0) {
+    selectedBatch = { student: staffBatches[0], att: staffBatches[0], fee: staffBatches[0] };
+  } else {
+    selectedBatch = { student: 'ALL', att: 'ALL', fee: 'ALL' };
+  }
+
   initDashFilters();
   initAttFilters();
   initFeeFilters();
   switchPage('home');
   checkMidnightSnapshot();
+}
+
+function migrateRollNumbers() {
+  // Get students without a roll number
+  const noRoll = DB.students.filter(s => !s.rollNo);
+  if (!noRoll.length) return;
+
+  // Sort by join date so earliest joiners get lower numbers
+  noRoll.sort((a, b) => {
+    const da = parseDate(a.joinDate), db = parseDate(b.joinDate);
+    if (da && db) return da - db;
+    if (da) return -1;
+    if (db) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  // Find highest existing roll number
+  let nextRoll = DB.students.reduce((max, s) => Math.max(max, parseInt(s.rollNo)||0), 0) + 1;
+
+  // Assign unique roll numbers
+  noRoll.forEach(s => {
+    const idx = DB.students.findIndex(x => x.id === s.id);
+    if (idx >= 0) {
+      DB.students[idx].rollNo = nextRoll++;
+    }
+  });
+
+  scheduleFirebasePush();
 }
 
 function doLogout() {
@@ -2748,7 +2947,7 @@ function notifyFirebaseUpdate(remote, isPush) {
   }
 }
 
-const PAGE_ORDER_NAV = ['home','students','attendance','fees','enquiry','profile'];
+const PAGE_ORDER_NAV = ['home','students','attendance','fees','enquiry','activity','profile'];
 function switchPage(name) {
   const prevPage = currentPage;
   currentPage = name;
@@ -2813,6 +3012,7 @@ function switchPage(name) {
   if (name === 'attendance') { renderBatchChips('att'); renderAttendance(); }
   if (name === 'fees') { renderBatchChips('fee'); renderFees(); }
   if (name === 'enquiry') renderEnquiryList();
+  if (name === 'activity') renderActivityPage();
   if (name === 'profile') renderProfilePage();
 }
 function refreshCurrentPage() {
@@ -2825,24 +3025,41 @@ function refreshCurrentPage() {
 function renderBatchChips(page) {
   const el = document.getElementById(page + 'BatchChips');
   if (!el) return;
+
+  const staffBatches = getStaffBatches();
+  const restrictedBatches = staffBatches.length > 0 ? staffBatches : DB.batches;
+
+  // Auto-lock selection to first assigned batch for staff
+  if (staffBatches.length > 0 && selectedBatch[page] === 'ALL') {
+    selectedBatch[page] = staffBatches[0];
+  }
   const cur = selectedBatch[page] || 'ALL';
-  // Count per batch
+
   const activeStudents = getActiveStudents();
   const counts = {};
   DB.batches.forEach(b => counts[b] = activeStudents.filter(s => s.batch === b).length);
 
-  let html = `<div class="batch-chip ${cur==='ALL'?'active':''}" onclick="selectBatch('${page}','ALL',this)">All (${activeStudents.length})</div>`;
-  DB.batches.forEach(b => {
-    html += `<div class="batch-chip ${cur===b?'active':''}" onclick="selectBatch('${page}','${b}',this)">${b} (${counts[b]||0})</div>`;
+  let html = '';
+  if (staffBatches.length === 0) {
+    // Admin or unassigned staff — show All chip
+    html += `<div class="batch-chip ${cur==='ALL'?'active':''}" onclick="selectBatch('${page}','ALL',this)">All (${activeStudents.length})</div>`;
+  }
+  restrictedBatches.forEach(b => {
+    html += `<div class="batch-chip ${cur===b?'active':''}" onclick="selectBatch('${page}','${b}',this)">${escHtml(b)} (${counts[b]||0})</div>`;
   });
-  // For students page: add a "Dropped" chip at the end to filter banned students
-  if (page === 'student') {
+  if (page === 'student' && staffBatches.length === 0) {
     const droppedCount = getBannedStudents().length;
     html += `<div class="batch-chip ${cur==='__DROPPED__'?'active':''}" onclick="selectBatch('${page}','__DROPPED__',this)" style="${cur==='__DROPPED__'?'':'border-color:#ef444455;color:#f87171;'}">🚫 Dropped (${droppedCount})</div>`;
   }
   el.innerHTML = html;
 }
 function selectBatch(page, batch, el) {
+  const staffBatches = getStaffBatches();
+  // Block staff from switching to a batch they're not assigned to
+  if (staffBatches.length > 0 && batch !== '__DROPPED__' && !staffBatches.includes(batch) && batch !== 'ALL') {
+    showToast('You are not assigned to this batch', 'warn');
+    return;
+  }
   selectedBatch[page] = batch;
   el.closest('.batch-chips').querySelectorAll('.batch-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
@@ -2857,7 +3074,7 @@ function selectBatch(page, batch, el) {
 function getActiveStudents() {
   return DB.students
     .filter(s => !s.banned)
-    .sort((a,b) => a.name.localeCompare(b.name));
+    .sort((a,b) => (parseInt(a.rollNo)||9999) - (parseInt(b.rollNo)||9999) || a.name.localeCompare(b.name));
 }
 function getBannedStudents() {
   return DB.students
@@ -2959,6 +3176,7 @@ function openAddStudentModal(id=null) {
     const s = DB.students.find(x => x.id === id);
     if (!s) return;
     document.getElementById('modalStudentTitle').textContent = 'Edit Student';
+    document.getElementById('sRollNo').value = s.rollNo || '';
     document.getElementById('sName').value = s.name || '';
     document.getElementById('sDob').value = s.dob || ''; calcAgeFromDob(); if (!s.dob && s.age) document.getElementById('sAge').value = s.age || '';
     document.getElementById('sParent').value = s.parent || '';
@@ -2969,6 +3187,9 @@ function openAddStudentModal(id=null) {
     bSel.value = s.batch || DB.batches[0] || '';
   } else {
     document.getElementById('modalStudentTitle').textContent = 'Add Student';
+    // Auto-assign next unique roll number
+    const maxRoll = DB.students.reduce((max, s) => Math.max(max, parseInt(s.rollNo)||0), 0);
+    document.getElementById('sRollNo').value = maxRoll + 1;
     document.getElementById('sAge').value = ''; document.getElementById('sDob').value = ''; document.getElementById('sAgeAuto').textContent = '';
     ['sName','sAge','sDob','sParent','sContact','sContact2','sAddress'].forEach(f => document.getElementById(f).value = '');
     document.getElementById('sJoinDate').value = todayDisplay();
@@ -2985,8 +3206,15 @@ function saveStudent() {
   const joinDate = document.getElementById('sJoinDate').value.trim() || todayDisplay();
   const action = editStudId ? 'Update' : 'Add';
   confirm_('💾', action + ' Student', `${action} "${name}"?`, () => {
+    const rollNo = parseInt(document.getElementById('sRollNo').value) || undefined;
+    // Check uniqueness — skip check for the student being edited
+    if (rollNo) {
+      const duplicate = DB.students.find(s => parseInt(s.rollNo) === rollNo && s.id !== editStudId);
+      if (duplicate) { showToast(`Roll number ${rollNo} already assigned to ${duplicate.name}`, 'error'); return; }
+    }
     const data = {
       name,
+      rollNo,
       age: document.getElementById('sAge').value.trim(),
       dob: document.getElementById('sDob').value.trim(),
       parent: document.getElementById('sParent').value.trim(),
@@ -2998,7 +3226,8 @@ function saveStudent() {
     };
     if (editStudId) {
       const idx = DB.students.findIndex(s => s.id === editStudId);
-      if (idx >= 0) DB.students[idx] = { ...DB.students[idx], ...data };
+      // Keep original rollNo on edit — do not overwrite
+      if (idx >= 0) DB.students[idx] = { ...DB.students[idx], ...data, rollNo: DB.students[idx].rollNo };
       addLog('student_edit', `Edited "${name}"`);
     } else {
       DB.students.push({ id: 'S' + Date.now(), banned: false, ...data });
@@ -3445,6 +3674,8 @@ function setAttView(view) {
     btn.style.color       = active ? '#fff' : 'var(--offwhite)';
     btn.style.borderColor = active ? 'var(--accent2)' : 'var(--border)';
   });
+  const badge = document.getElementById('attViewBadge');
+  if (badge) badge.textContent = view.charAt(0).toUpperCase() + view.slice(1);
   renderAttendance();
 }
 
@@ -3604,7 +3835,12 @@ function renderStudentList() {
   const todayKey = todayStr();
   const todayAtt = DB.attendance[todayKey] || {};
   const attRank = s => { const v = todayAtt[s.id]; return v==='P'?0:v==='A'?1:2; };
-  actives.sort((a, b) => attRank(a) - attRank(b) || a.name.localeCompare(b.name));
+  // Sort by roll number first, then today's attendance, then name
+  actives.sort((a, b) => {
+    const ra = parseInt(a.rollNo) || 9999, rb = parseInt(b.rollNo) || 9999;
+    if (ra !== rb) return ra - rb;
+    return attRank(a) - attRank(b) || a.name.localeCompare(b.name);
+  });
 
   let html = '';
   const row = (s, isBanned, num) => {
@@ -3623,6 +3859,7 @@ function renderStudentList() {
           <div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold);margin-top:1px;">${num}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+              ${s.rollNo ? `<span style="background:var(--gold);color:var(--royal);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:800;">${s.rollNo}</span>` : ''}
               <span>${escHtml(s.name)}</span>
               ${isBanned?'<span class="badge badge-red">Dropout</span>':''}
               <span class="badge badge-blue">${escHtml(s.batch||'')}</span>
@@ -3720,19 +3957,43 @@ function saveBulkEdit() {
 function updateAttNavLabel() {
   const ySel = document.getElementById('attYear');
   const mSel = document.getElementById('attMonth');
+  const dSel = document.getElementById('attDate');
   const lbl  = document.getElementById('attNavLabel');
-  if (!ySel || !mSel || !lbl) return;
+  const lbl2 = document.getElementById('attDateNavLabel2');
+  const badge = document.getElementById('attViewBadge');
+  if (!ySel || !mSel) return;
   const m = parseInt(mSel.value);
-  lbl.textContent = MONTHS[m-1].substring(0,3) + ' ' + ySel.value;
+  const d = dSel ? parseInt(dSel.value) : '';
+  const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayName = d ? DAYS_SHORT[new Date(parseInt(ySel.value), m-1, d).getDay()] : '';
+  const dateStr = d ? `${pad(d)} ${dayName}, ` : '';
+  const fullLabel = dateStr + MONTHS[m-1].substring(0,3) + ' ' + ySel.value;
+  if (lbl)  lbl.textContent  = MONTHS[m-1].substring(0,3) + ' ' + ySel.value;
+  if (lbl2) lbl2.textContent = fullLabel;
+  // Update view badge
+  if (badge) {
+    const view = document.getElementById('attViewType')?.value || 'day';
+    const viewLabels = { day:'Day', month:'Month', year:'Year' };
+    badge.textContent = viewLabels[view] || 'Day';
+  }
+}
+function toggleAttDateNav() {
+  const body    = document.getElementById('attDateNavBody');
+  const chevron = document.getElementById('attDateNavChevron');
+  const btn     = document.getElementById('attDateNavToggleBtn');
+  if (!body) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if (chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+  if (btn) btn.style.borderRadius = open ? '10px' : '10px 10px 0 0';
 }
 function initAttFilters() {
   const now = new Date();
   const ySel = document.getElementById('attYear');
   const mSel = document.getElementById('attMonth');
-  const dSel = document.getElementById('attDate');
   if (!ySel) return;
   ySel.innerHTML = '';
-  for (let y = now.getFullYear()-2; y <= now.getFullYear()+1; y++)
+  for (let y = now.getFullYear()-10; y <= now.getFullYear()+10; y++)
     ySel.innerHTML += `<option${y===now.getFullYear()?' selected':''}>${y}</option>`;
   mSel.innerHTML = MONTHS.map((m,i) => `<option value="${i+1}"${i===now.getMonth()?' selected':''}>${m}</option>`).join('');
   updateDateOptions();
@@ -3764,8 +4025,9 @@ function navAtt(type, dir) {
     updateAttNavLabel(); updateDateOptions(); syncAttDisplaySelects(); renderAttendance();
   } else if (type === 'month') {
     let v = parseInt(mSel.value) + dir;
-    if (v < 1)  { v = 12; ySel.selectedIndex = Math.max(0, ySel.selectedIndex-1); updateAttNavLabel(); updateDateOptions(); syncAttDisplaySelects(); renderAttendance(); return; }
-    if (v > 12) { v = 1;  ySel.selectedIndex = Math.min(ySel.options.length-1, ySel.selectedIndex+1); updateAttNavLabel(); updateDateOptions(); syncAttDisplaySelects(); renderAttendance(); return; }
+    let y = parseInt(ySel.value);
+    if (v < 1)  { v = 12; y--; if (y < parseInt(ySel.options[0].value)) return; ySel.value = y; mSel.value = v; updateAttNavLabel(); updateDateOptions(); syncAttDisplaySelects(); renderAttendance(); return; }
+    if (v > 12) { v = 1;  y++; if (y > parseInt(ySel.options[ySel.options.length-1].value)) return; ySel.value = y; }
     mSel.value = v; updateAttNavLabel(); updateDateOptions(); syncAttDisplaySelects(); renderAttendance();
   } else if (type === 'date') {
     const y = parseInt(ySel.value), m = parseInt(mSel.value);
@@ -3820,6 +4082,11 @@ function studentAttendedMonth(sid, year, month) {
 }
 
 function markAttendance(sid, dateKey, status) {
+  // Block future dates as a safety net
+  if (dateKey > todayStr()) {
+    showToast('Cannot mark attendance for future dates', 'error');
+    return;
+  }
   if (!DB.attendance[dateKey]) DB.attendance[dateKey] = {};
   const existing = DB.attendance[dateKey][sid];
   const s = DB.students.find(x => x.id === sid);
@@ -3867,6 +4134,54 @@ function markAttendance(sid, dateKey, status) {
   renderAttendance();
 }
 
+function markAllAttendance(dateKey, status, checked) {
+  if (dateKey > todayStr()) {
+    showToast('Cannot mark attendance for future dates', 'error');
+    renderAttendance();
+    return;
+  }
+  const y = parseInt(dateKey.split('-')[0]);
+  const m = parseInt(dateKey.split('-')[1]);
+  const d = parseInt(dateKey.split('-')[2]);
+  const batch = selectedBatch.att;
+  let students = getActiveStudents();
+  if (batch !== 'ALL') students = students.filter(s => s.batch === batch);
+  const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d));
+  if (!enrolled.length) { renderAttendance(); return; }
+
+  const label = status === 'P' ? 'Present' : 'Absent';
+  if (checked) {
+    confirm_('✅', `Mark All ${label}`, `Mark all ${enrolled.length} student(s) as ${label} on ${dateKey}?`, () => {
+      if (!DB.attendance[dateKey]) DB.attendance[dateKey] = {};
+      enrolled.forEach(s => { DB.attendance[dateKey][s.id] = status; });
+      saveLocal();
+      scheduleFirebasePush();
+      addLog('attendance', `All students → ${status} on ${dateKey}`);
+      showToast(`All marked ${label} ✓`, 'success');
+      renderAttendance();
+    });
+    // revert checkbox until confirmed
+    const cb = document.getElementById(status === 'P' ? 'chkAllPresent' : 'chkAllAbsent');
+    if (cb) cb.checked = false;
+  } else {
+    confirm_('🗑️', `Clear All ${label}`, `Remove ${label} mark for all students on ${dateKey}?`, () => {
+      if (!DB.attendance[dateKey]) { renderAttendance(); return; }
+      enrolled.forEach(s => {
+        if (DB.attendance[dateKey][s.id] === status) delete DB.attendance[dateKey][s.id];
+      });
+      if (!Object.keys(DB.attendance[dateKey]).length) delete DB.attendance[dateKey];
+      saveLocal();
+      scheduleFirebasePush();
+      addLog('attendance', `All ${status} cleared on ${dateKey}`);
+      showToast(`All ${label} marks cleared ✓`, 'success');
+      renderAttendance();
+    });
+    // revert checkbox until confirmed
+    const cb = document.getElementById(status === 'P' ? 'chkAllPresent' : 'chkAllAbsent');
+    if (cb) cb.checked = true;
+  }
+}
+
 function renderAttendance() {
   const viewType = document.getElementById('attViewType').value;
   const y = parseInt(document.getElementById('attYear').value);
@@ -3886,11 +4201,13 @@ function renderAttendance() {
 
   if (viewType === 'day') {
     const dateKey = `${y}-${pad(m)}-${pad(d)}`;
+    const isFutureDate = dateKey > todayStr();
     const dayData = DB.attendance[dateKey] || {};
     const classDay = isClassDay(dateKey);
 
-    // Only enrolled students
-    const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d));
+    // Only enrolled students — sorted by roll number
+    const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d))
+      .sort((a, b) => (parseInt(a.rollNo)||9999) - (parseInt(b.rollNo)||9999) || a.name.localeCompare(b.name));
 
     // Summary counts
     let pCount=0, aCount=0, lCount=0;
@@ -3902,22 +4219,41 @@ function renderAttendance() {
         else lCount++;
       });
     }
-    summBar.innerHTML = `<div class="att-summary-bar">
-      <span style="color:#4ade80;">✅ ${pCount} Present</span>
-      <span style="color:#f87171;">❌ ${aCount} Absent</span>
-      <span style="color:var(--gray);">🏃 ${lCount} Leave</span>
-      ${!classDay?'<span style="color:var(--gold);">🏖️ Holiday</span>':''}
+    const allPresent = enrolled.length > 0 && pCount === enrolled.length;
+    const allAbsent  = enrolled.length > 0 && aCount === enrolled.length;
+    summBar.innerHTML = `<div class="att-summary-bar" style="justify-content:space-between;align-items:center;">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <span style="color:#4ade80;">✅ ${pCount} Present</span>
+        <span style="color:#f87171;">❌ ${aCount} Absent</span>
+        <span style="color:var(--gray);">🏃 ${lCount} Leave</span>
+        ${!classDay?'<span style="color:var(--gold);">🏖️ Holiday</span>':''}
+      </div>
+      ${!isFutureDate ? `<div style="display:flex;gap:8px;flex-shrink:0;">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;font-weight:700;color:#4ade80;" title="Mark all Present">
+          <input type="checkbox" id="chkAllPresent" ${allPresent?'checked':''} onchange="markAllAttendance('${dateKey}','P',this.checked)"
+            style="width:16px;height:16px;accent-color:#22c55e;cursor:pointer;flex-shrink:0;">
+          All P
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px;font-weight:700;color:#f87171;" title="Mark all Absent">
+          <input type="checkbox" id="chkAllAbsent" ${allAbsent?'checked':''} onchange="markAllAttendance('${dateKey}','A',this.checked)"
+            style="width:16px;height:16px;accent-color:#ef4444;cursor:pointer;flex-shrink:0;">
+          All A
+        </label>
+      </div>` : ''}
     </div>`;
 
     const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const dayOfWeek = DAYS_SHORT[new Date(y, m-1, d).getDay()];
-    let html = `<div class="att-date-header" style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-      <span style="font-size:18px;">📅</span>
-      <div>
-        <div style="font-size:15px;font-weight:800;color:var(--gold);line-height:1.2;">${dayOfWeek}, ${pad(d)} ${MONTHS[m-1]} ${y}</div>
-        ${!classDay?'<div style="font-size:11px;color:var(--graydk);margin-top:2px;">No class recorded yet</div>':''}
-      </div>
-    </div>`;
+    let html = ``;
+    if (isFutureDate) {
+      html += `<div style="background:#f59e0b18;border:1px solid #f59e0b55;border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:18px;">🔒</span>
+        <div style="font-size:12px;color:#fbbf24;font-weight:600;">Future date — attendance cannot be marked.</div>
+      </div>`;
+      wrap.innerHTML = html;
+      updateWheel(enrolled, 0, 0, enrolled.length, false);
+      return;
+    }
     html += `<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">`;
     if (!enrolled.length) {
       html += `<div class="empty-state">No students enrolled on this date.</div>`;
@@ -3928,7 +4264,10 @@ function renderAttendance() {
         if (attStatusFilter === 'present' && v !== 'P') return;
         if (attStatusFilter === 'absent'  && v !== 'A') return;
         html += `<div class="att-row">
-          <div class="att-name">${escHtml(s.name)}<br><span style="font-size:10px;color:var(--gray);">${escHtml(s.batch||'')}</span></div>
+          <div class="att-name">
+            ${s.rollNo ? `<span style="background:var(--gold);color:var(--royal);border-radius:4px;padding:0px 5px;font-size:10px;font-weight:800;margin-right:4px;">${s.rollNo}</span>` : ''}${escHtml(s.name)}<br>
+            <span style="font-size:10px;color:var(--gray);">${escHtml(s.batch||'')}</span>
+          </div>
           <div class="att-btns">
             <button class="att-btn ${v==='P'?'present':'inactive'}" onclick="markAttendance('${s.id}','${dateKey}','P')" title="${v==='P'?'Click to clear':'Mark Present'}">P</button>
             <button class="att-btn ${v==='A'?'absent':'inactive'}" onclick="markAttendance('${s.id}','${dateKey}','A')" title="${v==='A'?'Click to clear':'Mark Absent'}">A</button>
@@ -3998,7 +4337,7 @@ function renderAttendance() {
     const attended = enrolled.filter(s => studentAttendedMonth(s.id, y, m));
     const notAttended = enrolled.filter(s => !studentAttendedMonth(s.id, y, m));
 
-    let html = `<div class="att-date-header">📅 ${MONTHS[m-1]} ${y} — Monthly Summary</div>`;
+    let html = ``;
 
     const monthRow = (s, isNA) => {
       // Only count class days from this student's join date
@@ -4070,12 +4409,25 @@ function updateFeeNavLabel() {
   const ySel  = document.getElementById('feeYear');
   const yoSel = document.getElementById('feeYearOnly');
   const lbl   = document.getElementById('feeNavLabel');
+  const lbl2  = document.getElementById('feeNavLabel2');
   const yLbl  = document.getElementById('feeYearNavLabel');
-  if (lbl && mSel && ySel) {
+  if (mSel && ySel) {
     const m = parseInt(mSel.value);
-    lbl.textContent = MONTHS[m-1].substring(0,3) + ' ' + ySel.value;
+    const text = MONTHS[m-1].substring(0,3) + ' ' + ySel.value;
+    if (lbl)  lbl.textContent  = text;
+    if (lbl2) lbl2.textContent = text;
   }
   if (yLbl && yoSel) yLbl.textContent = yoSel.value;
+}
+function toggleFeeNav() {
+  const body    = document.getElementById('feeNavBody');
+  const chevron = document.getElementById('feeNavChevron');
+  const btn     = document.getElementById('feeNavToggleBtn');
+  if (!body) return;
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  if (chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+  if (btn) btn.style.borderRadius = open ? '10px' : '10px 10px 0 0';
 }
 function initFeeFilters() {
   const now = new Date();
@@ -4086,7 +4438,7 @@ function initFeeFilters() {
   [ySel, yoSel].forEach(sel => {
     if (!sel) return;
     sel.innerHTML = '';
-    for (let y = now.getFullYear()-3; y <= now.getFullYear()+1; y++)
+    for (let y = now.getFullYear()-10; y <= now.getFullYear()+10; y++)
       sel.innerHTML += `<option${y===now.getFullYear()?' selected':''}>${y}</option>`;
   });
   if (mSel) mSel.innerHTML = MONTHS.map((mn,i) =>
@@ -4121,6 +4473,9 @@ function setFeeFilterMode(mode) {
   }
   updateFeeNavLabel();
   syncFeeDisplaySelects();
+  // Update mode badge in collapsed header
+  const badge = document.getElementById('feeModeBadge');
+  if (badge) badge.textContent = mode === 'month' ? 'Monthly' : 'Yearly';
   renderFees();
 }
 
@@ -4614,7 +4969,10 @@ function loadDashboard() {
   const joinedLbl = document.getElementById('statJoinedLabel');
   if (joinedLbl) joinedLbl.textContent = 'Joined (' + MONTHS[m-1].substring(0,3) + ')';
 
-  const actives = getActiveStudents();
+  const staffBatches = getStaffBatches();
+  const actives = staffBatches.length > 0
+    ? getActiveStudents().filter(s => staffBatches.includes(s.batch))
+    : getActiveStudents();
   document.getElementById('statTotal').textContent = actives.length;
 
   // Joined tile: students who joined in the selected month
@@ -4838,7 +5196,7 @@ function renderDashChart() {
   const leg2 = document.getElementById('dashChartLegend2');
   const legAvg = document.getElementById('dashChartLegendAvg');
   if (leg1) { leg1.querySelector('span').style.background = dashChartMode==='present'?'#22c55e':'#2563eb'; leg1.childNodes[leg1.childNodes.length-1].textContent = dashChartMode==='present'?' Attended':' Active'; }
-  if (leg2) { leg2.style.display='flex'; leg2.querySelector('span').style.background = dashChartMode==='present'?'#f97316':'#ef4444'; leg2.childNodes[leg2.childNodes.length-1].textContent = dashChartMode==='present'?' Absent':' Blocked'; }
+  if (leg2) { leg2.querySelector('span').style.background = dashChartMode==='present'?'#f97316':'#ef4444'; leg2.childNodes[leg2.childNodes.length-1].textContent = dashChartMode==='present'?' Absent':' Blocked'; }
   if (legAvg) legAvg.style.display = dashChartMode==='present' ? 'flex' : 'none';
 
   _drawStackedBars(canvas, data, dashChartMode, false);
@@ -5695,11 +6053,23 @@ function deleteBatch(i) {
 function renderUserList() {
   let html = '';
   DB.users.forEach(u => {
-    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
-      <div>
-        <div style="font-size:13px;font-weight:700;color:var(--offwhite);">👤 ${escHtml(u.name||u.email||u.id)} <span class="badge ${u.role==='admin'?'badge-gold':'badge-blue'}">${u.role}</span></div>
-        <div style="font-size:11px;color:var(--gray);margin-top:2px;">📧 ${escHtml(u.email||u.id)}</div>
+    const batches = Array.isArray(u.assignedBatches) && u.assignedBatches.length > 0
+      ? u.assignedBatches.map(b => `<span class="badge badge-blue" style="font-size:10px;">${escHtml(b)}</span>`).join(' ')
+      : (u.role === 'staff' ? '<span style="font-size:10px;color:var(--graydk);">All batches</span>' : '');
+    html += `<div style="padding:9px 10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--offwhite);">👤 ${escHtml(u.name||u.email||u.id)} <span class="badge ${u.role==='admin'?'badge-gold':'badge-blue'}">${u.role}</span></div>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px;">📧 ${escHtml(u.email||u.id)}</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0;">
+          ${u.role==='staff'?`<button onclick="openAssignBatchModal('${escHtml(u.id)}')" class="btn btn-gold btn-xs">📦 Batch</button>`:''}
+          <button onclick="openEditUser('${escHtml(u.id)}')" class="btn btn-outline btn-xs">✏️ Edit</button>
+        </div>
       </div>
+      ${u.role==='staff'?`<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:10px;color:var(--graydk);">Batches:</span> ${batches}
+      </div>`:''}
     </div>`;
   });
   document.getElementById('userListWrap').innerHTML = html || `<div style="color:var(--gray);font-size:12px;">No users.</div>`;
@@ -5718,6 +6088,8 @@ function openAddUserModal(role='staff') {
   if (roleEl) roleEl.value = role;
   const errEl = document.getElementById('userSaveError');
   if (errEl) errEl.style.display = 'none';
+  populateBatchAssignCheckboxes([]);
+  toggleBatchAssignField();
   openModal('modalUser');
 }
 function openEditUser(id) {
@@ -5732,6 +6104,8 @@ function openEditUser(id) {
   if (roleEl) roleEl.value = u.role;
   const errEl = document.getElementById('userSaveError');
   if (errEl) errEl.style.display = 'none';
+  populateBatchAssignCheckboxes(u.assignedBatches || []);
+  toggleBatchAssignField();
   openModal('modalUser');
 }
 async function saveUser() {
@@ -5762,7 +6136,7 @@ async function saveUser() {
   if (eid) {
     confirm_('👤','Save User',`Update profile for "${email}"?`, async () => {
       const idx = DB.users.findIndex(u => u.id===eid);
-      if (idx>=0) DB.users[idx] = { ...DB.users[idx], id:uid, email, name:name||email, role };
+      if (idx>=0) DB.users[idx] = { ...DB.users[idx], id:uid, email, name:name||email, role, assignedBatches: getSelectedBatchAssignments() };
       saveLocal();
       scheduleFirebasePush();
       addLog('user', `Edited user "${email}"`);
@@ -5825,7 +6199,7 @@ async function saveUser() {
       }
 
       // Auth account created — now save profile to database
-      DB.users.push({ id:uid, email, name:name||email, role });
+      DB.users.push({ id:uid, email, name:name||email, role, assignedBatches: getSelectedBatchAssignments() });
       saveLocal();
       scheduleFirebasePush();
       addLog('user', `Added user "${email}" (${role})`);
@@ -6397,6 +6771,353 @@ setInterval(() => {
     } catch(e) { /* session restore failed — user stays on login */ }
   });
 })();
+
+// ================================================================
+// SETTINGS MODAL
+// ================================================================
+// ================================================================
+// CLASS ACTIVITY LOG
+// ================================================================
+function openClassLogAddModal() {
+  const staffBatches = getStaffBatches();
+  const allowedBatches = staffBatches.length > 0 ? staffBatches : DB.batches;
+  const bSel = document.getElementById('classLogBatch');
+  if (bSel) bSel.innerHTML = allowedBatches.map(b => `<option value="${escHtml(b)}">${escHtml(b)}</option>`).join('');
+  document.getElementById('classLogDate').value = todayStr();
+  document.getElementById('classLogInTime').value = '';
+  document.getElementById('classLogOutTime').value = '';
+  document.getElementById('classLogNote').value = '';
+  openModal('modalClassLogAdd');
+}
+
+function saveClassLog() {
+  const date    = document.getElementById('classLogDate').value;
+  const batch   = document.getElementById('classLogBatch').value;
+  const inTime  = document.getElementById('classLogInTime').value;
+  const outTime = document.getElementById('classLogOutTime').value;
+  const note    = (document.getElementById('classLogNote').value || '').trim();
+
+  if (!date)  { showToast('Please select a date', 'error'); return; }
+  if (!batch) { showToast('Please select a batch', 'error'); return; }
+
+  // Calculate duration if both times provided
+  let duration = '';
+  if (inTime && outTime) {
+    const [ih, im] = inTime.split(':').map(Number);
+    const [oh, om] = outTime.split(':').map(Number);
+    const mins = (oh * 60 + om) - (ih * 60 + im);
+    if (mins > 0) {
+      const h = Math.floor(mins / 60);
+      const m = mins % 60;
+      duration = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    }
+  }
+
+  if (!Array.isArray(DB.classLog)) DB.classLog = [];
+
+  const by = currentUser ? (currentUser.name || currentUser.id) : 'Unknown';
+  DB.classLog.unshift({
+    id: 'cl_' + Date.now(),
+    date, batch, inTime, outTime, duration, note, by,
+    at: new Date().toISOString()
+  });
+
+  scheduleFirebasePush();
+  addLog('classlog', `Class logged: ${batch} on ${date} by ${by}`);
+  showToast('Class entry saved ✓', 'success');
+  closeModal('modalClassLogAdd');
+  renderClassLog();
+}
+
+function renderClassLog() {
+  const wrap = document.getElementById('classLogList');
+  if (!wrap) return;
+
+  if (!Array.isArray(DB.classLog)) DB.classLog = [];
+
+  const filterBatch = document.getElementById('classLogFilterBatch')?.value || '';
+  const filterMonth = document.getElementById('classLogFilterMonth')?.value || '';
+
+  let list = [...DB.classLog].sort((a, b) => b.date.localeCompare(a.date));
+  if (filterBatch) list = list.filter(e => e.batch === filterBatch);
+  if (filterMonth) list = list.filter(e => e.date.startsWith(filterMonth));
+
+  if (!list.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:20px;">No entries found.</div>';
+    return;
+  }
+
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  wrap.innerHTML = list.map(e => {
+    const d = new Date(e.date + 'T00:00:00');
+    const dayName = DAYS[d.getDay()];
+    const dateDisp = `${dayName}, ${pad(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    const canDelete = isAdmin();
+
+    // Format time as 12-hour
+    const fmt12 = t => {
+      if (!t) return '';
+      const [h, m] = t.split(':').map(Number);
+      return `${((h % 12) || 12)}:${pad(m)} ${h >= 12 ? 'PM' : 'AM'}`;
+    };
+    const inDisp  = fmt12(e.inTime);
+    const outDisp = fmt12(e.outTime);
+
+    return `<div style="padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+          <span style="font-size:13px;font-weight:700;color:var(--gold);">${escHtml(dateDisp)}</span>
+          <span class="badge badge-blue" style="font-size:10px;">${escHtml(e.batch)}</span>
+        </div>
+        ${(inDisp || outDisp) ? `
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;flex-wrap:wrap;">
+          ${inDisp  ? `<span style="font-size:12px;font-weight:600;"><span style="color:#4ade80;">🟢 In:</span> <span style="color:var(--offwhite);">${escHtml(inDisp)}</span></span>` : ''}
+          ${outDisp ? `<span style="font-size:12px;font-weight:600;"><span style="color:#f87171;">🔴 Out:</span> <span style="color:var(--offwhite);">${escHtml(outDisp)}</span></span>` : ''}
+          ${e.duration ? `<span class="badge badge-gold" style="font-size:10px;">⏱ ${escHtml(e.duration)}</span>` : ''}
+        </div>` : ''}
+        ${e.note ? `<div style="font-size:12px;color:var(--offwhite);line-height:1.5;margin-bottom:3px;">${escHtml(e.note)}</div>` : ''}
+        <div style="font-size:10px;color:var(--graydk);">✍️ ${escHtml(e.by)} · ${new Date(e.at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      ${canDelete ? `<button onclick="deleteClassLog('${escHtml(e.id)}')" class="btn btn-danger btn-xs" style="flex-shrink:0;">🗑️</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function deleteClassLog(id) {
+  confirm_('🗑️', 'Delete Entry', 'Delete this class log entry?', async () => {
+    // Remove from local DB
+    DB.classLog = (DB.classLog || []).filter(e => e.id !== id);
+
+    // Directly delete from Firebase if connected
+    if (fbDb) {
+      try {
+        const _fbUser = window._fbAuth && window._fbAuth.currentUser;
+        const _token  = _fbUser ? await _fbUser.getIdToken() : '';
+        const _auth   = _token ? '?auth=' + encodeURIComponent(_token) : '';
+        // Push the full updated classLog array to Firebase
+        const url = fbBaseUrl() + '/sacdb/classLog.json' + _auth;
+        await fetch(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(DB.classLog)
+        });
+      } catch(e) {
+        // Fallback to scheduled push
+        scheduleFirebasePush();
+      }
+    } else {
+      scheduleFirebasePush();
+    }
+
+    addLog('classlog', 'Deleted class log entry ' + id);
+    showToast('Entry deleted ✓', 'success');
+    renderClassLog();
+  });
+}
+
+function renderActivityPage() {
+  // Set today's date as default
+  const dateEl = document.getElementById('classLogDate');
+  if (dateEl && !dateEl.value) dateEl.value = todayStr();
+
+  const noteEl = document.getElementById('classLogNote');
+  if (noteEl) noteEl.value = '';
+
+  // Populate batch dropdowns restricted to staff's assigned batches
+  const staffBatches = getStaffBatches();
+  const allowedBatches = staffBatches.length > 0 ? staffBatches : DB.batches;
+
+  const bSel = document.getElementById('classLogBatch');
+  if (bSel) bSel.innerHTML = allowedBatches.map(b => `<option value="${escHtml(b)}">${escHtml(b)}</option>`).join('');
+
+  const fSel = document.getElementById('classLogFilterBatch');
+  if (fSel) {
+    const cur = fSel.value;
+    fSel.innerHTML = '<option value="">All Batches</option>' +
+      allowedBatches.map(b => `<option value="${escHtml(b)}"${cur===b?' selected':''}>${escHtml(b)}</option>`).join('');
+  }
+
+  // Set filter month to current month if not set
+  const mEl = document.getElementById('classLogFilterMonth');
+  if (mEl && !mEl.value) {
+    const now = new Date();
+    mEl.value = now.getFullYear() + '-' + pad(now.getMonth() + 1);
+  }
+
+  renderClassLog();
+}
+
+function populateBatchAssignCheckboxes(assigned) {
+  const wrap = document.getElementById('batchAssignCheckboxes');
+  if (!wrap) return;
+  wrap.innerHTML = DB.batches.map(b => `
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--card);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:12px;font-weight:600;">
+      <input type="checkbox" value="${escHtml(b)}" ${(assigned||[]).includes(b)?'checked':''}
+        style="width:15px;height:15px;accent-color:var(--accent2);cursor:pointer;">
+      ${escHtml(b)}
+    </label>`).join('');
+}
+function toggleBatchAssignField() {
+  const role = document.getElementById('newUserRole')?.value;
+  const grp  = document.getElementById('batchAssignGroup');
+  if (grp) grp.style.display = role === 'staff' ? '' : 'none';
+}
+function getSelectedBatchAssignments() {
+  const cbs = document.querySelectorAll('#batchAssignCheckboxes input[type=checkbox]');
+  return Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value);
+}
+
+// Returns the batches a staff member is restricted to (empty = all)
+function getStaffBatches() {
+  if (isAdmin()) return [];
+  const batches = currentUser?.assignedBatches;
+  return Array.isArray(batches) && batches.length > 0 ? batches : [];
+}
+
+function openAssignBatchModal(userId) {
+  const u = DB.users.find(x => x.id === userId);
+  if (!u) return;
+  document.getElementById('assignBatchUserId').value = userId;
+  document.getElementById('assignBatchUserName').textContent = '👤 ' + (u.name || u.email || u.id);
+  document.getElementById('assignBatchUserEmail').textContent = '📧 ' + (u.email || u.id);
+  const assigned = Array.isArray(u.assignedBatches) ? u.assignedBatches : [];
+  document.getElementById('assignBatchCheckboxes').innerHTML = DB.batches.map(b => `
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;transition:border-color .15s;"
+      onclick="this.style.borderColor=this.querySelector('input').checked?'var(--border)':'var(--accent2)'">
+      <input type="checkbox" value="${escHtml(b)}" ${assigned.includes(b)?'checked':''}
+        style="width:17px;height:17px;accent-color:var(--accent2);cursor:pointer;flex-shrink:0;">
+      <span style="font-size:13px;font-weight:600;color:var(--offwhite);">${escHtml(b)}</span>
+    </label>`).join('');
+  openModal('modalAssignBatch');
+}
+function saveAssignBatch() {
+  const userId = document.getElementById('assignBatchUserId').value;
+  const cbs = document.querySelectorAll('#assignBatchCheckboxes input[type=checkbox]');
+  const assignedBatches = Array.from(cbs).filter(cb => cb.checked).map(cb => cb.value);
+  const idx = DB.users.findIndex(u => u.id === userId);
+  if (idx < 0) return;
+  const userName = DB.users[idx].name || DB.users[idx].email || userId;
+  DB.users[idx].assignedBatches = assignedBatches;
+  scheduleFirebasePush();
+  addLog('user', `Batch assigned to "${userName}": ${assignedBatches.join(', ') || 'All batches'}`);
+  closeModal('modalAssignBatch');
+  renderUserList();
+  showToast(assignedBatches.length
+    ? `Assigned ${assignedBatches.length} batch(es) to ${userName} ✓`
+    : `${userName} can now access all batches ✓`, 'success');
+}
+
+function openSettingsModal() {
+
+  const adminOnly = document.getElementById('settingsAdminOnly');
+  if (adminOnly) adminOnly.style.display = isAdmin() ? '' : 'none';
+
+  if (isAdmin()) renderSnapshotListSettings();
+
+  openModal('modalSettings');
+}
+
+async function renderSnapshotListSettings() {
+  const wrap = document.getElementById('snapshotListWrapSettings');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="empty-state" style="padding:14px;">🔄 Loading snapshots…</div>';
+  let list = [];
+  if (fbDb) {
+    try {
+      const remote = await fbGet('/snapshots');
+      if (remote && typeof remote === 'object') {
+        list = Object.keys(remote).map(key => {
+          const snap = remote[key];
+          return { key, time: snap._snapTime || new Date().toISOString(), label: snap._snapLabel || 'auto' };
+        }).sort((a, b) => b.key.localeCompare(a.key));
+        DB.snapshotIndex = list.map(s => ({ key: s.key, time: s.time, label: s.label }));
+      }
+    } catch(e) {
+      list = Array.isArray(DB.snapshotIndex) ? [...DB.snapshotIndex].sort((a,b) => b.key.localeCompare(a.key)) : [];
+    }
+  } else {
+    list = Array.isArray(DB.snapshotIndex) ? [...DB.snapshotIndex].sort((a,b) => b.key.localeCompare(a.key)) : [];
+  }
+  if (!list.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:14px;">No snapshots yet. Tap 📸 Snap Now to create one.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(s => {
+    const d   = new Date(s.time);
+    const lbl = s.label === 'manual' ? '🖐 Manual' : '🕛 Auto';
+    const col = s.label === 'manual' ? 'var(--accent2)' : 'var(--gold)';
+    const ts  = d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) +
+                ' ' + d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);gap:8px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--white);">📅 ${escHtml(s.key)}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px;">
+          <span style="color:${col};font-weight:600;">${lbl}</span> · ${escHtml(ts)}
+        </div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0;">
+        <button onclick="restoreSnapshot('${escHtml(s.key)}')" class="btn btn-warning btn-xs">↩ Restore</button>
+        <button onclick="deleteSnapshotSettings('${escHtml(s.key)}')" class="btn btn-danger btn-xs">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteSnapshotSettings(key) {
+  confirm_('🗑️', 'Delete Snapshot', 'Delete snapshot ' + key + '? This cannot be undone.',
+    async () => {
+      if (!fbDb) { showToast('Firebase not connected', 'error'); return; }
+      try {
+        const _fbUser = window._fbAuth && window._fbAuth.currentUser;
+        const _token  = _fbUser ? await _fbUser.getIdToken() : '';
+        const _auth   = _token ? '?auth=' + encodeURIComponent(_token) : '';
+        await fetch(fbBaseUrl() + '/snapshots/' + key + '.json' + _auth, { method: 'DELETE' });
+        DB.snapshotIndex = (DB.snapshotIndex || []).filter(s => s.key !== key);
+        scheduleFirebasePush();
+        renderSnapshotListSettings();
+        renderSnapshotList();
+        addLog('snapshot', 'Deleted snapshot ' + key);
+        showToast('Snapshot deleted ✓', 'success');
+      } catch(e) { showToast('Delete failed: ' + e.message, 'error'); }
+    });
+}
+
+async function takeSnapshotFromSettings() {
+  if (!fbDb) { showToast('Firebase not connected', 'error'); return; }
+  confirm_('📸', 'Take Snapshot', 'Save a snapshot of all current data?', async () => {
+    const key = await takeSnapshot('manual');
+    if (key) {
+      showToast('📸 Snapshot saved: ' + key, 'success');
+      addLog('snapshot', 'Manual snapshot: ' + key);
+      renderSnapshotListSettings();
+      renderSnapshotList();
+    } else {
+      showToast('Snapshot failed', 'error');
+    }
+  });
+}
+
+function settingsPull() {
+  manualPull();
+  setTimeout(() => {
+    const src = document.getElementById('fbStatus');
+    const dst = document.getElementById('fbStatusModal');
+    if (src && dst) dst.textContent = src.textContent;
+  }, 1800);
+}
+
+function settingsPush() {
+  pushToFirebase();
+  setTimeout(() => {
+    const srcS = document.getElementById('fbStatus');
+    const dstS = document.getElementById('fbStatusModal');
+    if (srcS && dstS) dstS.textContent = srcS.textContent;
+    const srcL = document.getElementById('lastPushInfo');
+    const dstL = document.getElementById('lastPushInfoModal');
+    if (srcL && dstL) dstL.textContent = srcL.textContent;
+  }, 2200);
+}
 </script>
 
 <!-- ============================================================
