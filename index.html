@@ -7,7 +7,7 @@
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d2040">
+<meta name="theme-color" content="#ffffff">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,6 +15,9 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -25,13 +28,13 @@
 
   // ── YOUR FIREBASE CONFIG (safe to have here — Auth token protects data) ──
   const firebaseConfig = {
-    apiKey:            "AIzaSyBwte6f0d0m5ivE2UpdWu2dnbWFkdqrgdM",
-    authDomain:        "meelkazhani-silambam-academy.firebaseapp.com",
-    databaseURL:       "https://meelkazhani-silambam-academy-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId:         "meelkazhani-silambam-academy",
-    storageBucket:     "meelkazhani-silambam-academy.firebasestorage.app",
-    messagingSenderId: "338928841762",
-    appId:             "1:338928841762:web:aebefe53d5c4c317a9867b"
+    apiKey:            "AIzaSyCz3JNH9m_-rjMzA8aMsrhMnYDLJiR4NBw",
+    authDomain:        "meelkazhani-silambam-academy-t.firebaseapp.com",
+    databaseURL:       "https://meelkazhani-silambam-academy-t-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId:         "meelkazhani-silambam-academy-t",
+    storageBucket:     "meelkazhani-silambam-academy-t.firebasestorage.app",
+    messagingSenderId: "900036312619",
+    appId:             "1:900036312619:web:d6b220fa69bc7702f3f46e"
   };
 
   const app  = initializeApp(firebaseConfig);
@@ -46,6 +49,17 @@
 </script>
 <style>
 :root{
+  --royal:#f1f5fa;--royal2:#ffffff;--royal3:#e8eef6;
+  --accent:#5b7cc4;--accent2:#5b7cc4;
+  --gold:#000000;--goldl:#1a1a1a;
+  --white:#000000;--offwhite:#1a1a1a;
+  --gray:#333333;--graydk:#555555;
+  --red:#e06b6b;--green:#4caf8e;--orange:#e0a05a;
+  --card:#ffffff;--card2:#f4f7fb;--border:#d8e0ec;
+  --shadow:0 4px 20px rgba(30,50,90,.10);--radius:12px;
+  --font:'Poppins','Segoe UI',system-ui,sans-serif;
+}
+body.dark-theme{
   --royal:#0a1628;--royal2:#0d2040;--royal3:#122654;
   --accent:#1e3a8a;--accent2:#2563eb;
   --gold:#f59e0b;--goldl:#fbbf24;
@@ -53,9 +67,10 @@
   --gray:#94a3b8;--graydk:#64748b;
   --red:#ef4444;--green:#22c55e;--orange:#f97316;
   --card:#0f1f3d;--card2:#162744;--border:#1e3a5f;
-  --shadow:0 4px 24px rgba(0,0,0,.4);--radius:12px;
-  --font:'Segoe UI',system-ui,sans-serif;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
 }
+body.dark-theme .topbar{background:#0d2040;}
+body.dark-theme .bottom-nav{background:#0d2040;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:var(--font);background:var(--royal);color:var(--white);min-height:100vh;overflow-x:hidden;}
 a{color:inherit;text-decoration:none;}
@@ -66,23 +81,40 @@ input,select,textarea{font-family:var(--font);}
 ::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:2px;}
 
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;background:var(--royal);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
-.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 28px;width:100%;max-width:400px;text-align:center;box-shadow:var(--shadow);}
-.login-logo{width:80px;height:80px;background:var(--accent2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:32px;overflow:hidden;}
-.login-title{font-size:19px;font-weight:700;color:var(--gold);margin-bottom:4px;line-height:1.3;}
-.login-sub{font-size:13px;color:var(--gray);margin-bottom:24px;}
-.login-field{margin-bottom:12px;text-align:left;}
-.login-field label{font-size:12px;color:var(--gray);display:block;margin-bottom:5px;}
-.login-field input{width:100%;padding:12px 14px;background:var(--royal2);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:14px;outline:none;}
-.login-field input:focus{border-color:var(--accent2);}
-.btn-login{width:100%;padding:13px;background:var(--accent2);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;margin-top:6px;}
+#loginScreen{position:fixed;inset:0;background:linear-gradient(180deg,#0f1f3d 0%,#0a1628 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;}
+.meteor{position:absolute;width:4px;height:4px;background:#fff;border-radius:50%;box-shadow:0 0 10px 2px rgba(255,255,255,.9);opacity:0;z-index:0;pointer-events:none;}
+.meteor.m1{top:-5%;right:-5%;animation:meteorFall 5.5s linear infinite;animation-delay:0s;}
+.meteor.m2{top:-5%;right:20%;animation:meteorFall 7s linear infinite;animation-delay:2.4s;}
+.meteor.m3{top:-5%;right:40%;animation:meteorFall 6s linear infinite;animation-delay:4s;}
+.meteor.m4{top:-5%;right:-15%;animation:meteorFall 8s linear infinite;animation-delay:1.2s;}
+.meteor.m5{top:-5%;right:60%;animation:meteorFall 6.5s linear infinite;animation-delay:5.2s;}
+@keyframes meteorFall{0%{opacity:0;transform:translate(0,0);}8%{opacity:.95;}92%{opacity:.95;}100%{opacity:0;transform:translate(-90vw,100vh);}}
+.star{position:absolute;background:#fff;border-radius:50%;z-index:0;pointer-events:none;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.7);}50%{opacity:.9;transform:scale(1.1);}}
+#loginScene{display:none;}
+.login-box{position:relative;z-index:2;background:#fff;border:none;box-shadow:0 14px 40px rgba(0,0,0,.2);border-radius:22px;padding:32px 26px;width:100%;max-width:340px;text-align:center;}
+.login-logo{width:50px;height:50px;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:38px;overflow:hidden;color:#e8392f;}
+.login-logo img{width:64px;height:64px;object-fit:cover;border-radius:50%;}
+.login-title{font-size:20px;font-weight:800;color:#10131a;margin-bottom:4px;line-height:1.2;}
+.login-sub{font-size:14px;color:#4a5160;margin-bottom:26px;}
+.login-field{margin-bottom:16px;text-align:left;}
+.login-field label{display:block;font-size:12px;color:#3a4150;font-weight:600;margin-bottom:6px;}
+.login-field .field-wrap{display:flex;align-items:center;gap:10px;border:1px solid #e3e6ec;border-radius:10px;padding:11px 14px;}
+.login-field .field-wrap:focus-within{border-color:#e8392f;}
+.login-field .login-ico{color:#e8392f;font-size:16px;flex-shrink:0;}
+.login-field input{flex:1;width:100%;padding:0;background:transparent;border:none;color:#1f2430;font-size:14px;outline:none;}
+.login-field input::placeholder{color:#b8bcc6;}
+.login-eye{color:#e8392f;font-size:16px;flex-shrink:0;cursor:pointer;background:none;border:none;padding:0;}
+.btn-login{width:100%;padding:13px;background:linear-gradient(90deg,#6e8bd6,#b06fc4);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px;margin-top:6px;}
+.btn-login:active{opacity:.9;}
+.login-support{font-size:12px;color:#8a8f9c;line-height:1.5;margin-top:22px;}
 
 /* APP */
 #app{display:none;flex-direction:column;height:100vh;overflow:hidden;}
 #app.active{display:flex;}
 
 /* TOPBAR */
-.topbar{background:var(--royal2);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100;}
+.topbar{background:#dfe5ee;border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100;}
 .topbar-left{display:flex;align-items:center;gap:9px;}
 .logo-img{width:38px;height:38px;border-radius:8px;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
 .logo-img img{width:100%;height:100%;object-fit:cover;}
@@ -96,9 +128,11 @@ input,select,textarea{font-family:var(--font);}
 .content{flex:1;overflow:hidden;position:relative;}
 
 /* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--royal2);border-top:1px solid var(--border);display:flex;z-index:200;height:60px;}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--gray);font-size:10px;font-weight:500;transition:color .2s;padding:4px 1px;border:none;background:none;}
-.nav-item.active{color:var(--gold);}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#dfe5ee;border-top:1px solid var(--border);display:flex;z-index:200;height:60px;box-shadow:0 -2px 10px rgba(30,50,90,.06);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--gray);font-size:10px;font-weight:500;transition:all .2s;padding:4px 1px;border:none;background:none;position:relative;}
+.nav-item.active{color:var(--accent2);font-weight:700;}
+.nav-item.active svg{stroke:var(--accent2);}
+.nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 3px 3px;background:var(--accent2);}
 .nav-item svg{width:18px;height:18px;}
 .nav-item span{font-size:8px;letter-spacing:-.3px;overflow:hidden;text-overflow:clip;white-space:nowrap;max-width:100%;}
 
@@ -132,11 +166,24 @@ input,select,textarea{font-family:var(--font);}
 }
 
 /* CARDS */
-.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;transition:transform .15s ease, box-shadow .15s ease;}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(30,50,90,.14);}
+.hover-lift:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(30,50,90,.14);}
+.hover-row:hover{background:var(--card2);}
 
 /* STATS GRID */
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 10px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 10px;transition:transform .15s ease, box-shadow .15s ease;}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(30,50,90,.18);cursor:pointer;}
+.stat-card.grad{border:none;color:#fff;box-shadow:0 4px 16px rgba(30,50,90,.12);}
+.stat-card.grad:hover{transform:translateY(-3px);box-shadow:0 10px 26px rgba(30,50,90,.28);}
+.stat-card.grad .stat-label{color:rgba(255,255,255,.9);}
+.stat-card.grad .stat-val{color:#fff !important;}
+.stat-card.grad .stat-icon{background:rgba(255,255,255,.22) !important;}
+.stat-blue{background:linear-gradient(135deg,#6b8fd6,#5470b8);}
+.stat-green{background:linear-gradient(135deg,#5bbf9a,#479b7c);}
+.stat-red{background:linear-gradient(135deg,#e08a8a,#c96f6f);}
+.stat-orange{background:linear-gradient(135deg,#e0b06f,#cf954f);}
 .stat-card-info{flex:1;min-width:0;}
 .stat-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:4px;}
 .stat-label{font-size:11px;color:var(--gray);margin-bottom:2px;}
@@ -205,7 +252,8 @@ tr:hover td{background:var(--card2);}
 .filter-select{padding:7px 9px;background:var(--royal2);border:1px solid var(--border);border-radius:7px;color:var(--white);font-size:12px;outline:none;flex:1;min-width:75px;}
 
 /* ATTENDANCE */
-.att-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);}
+.att-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);transition:background .15s ease;}
+.att-row:hover{background:var(--card2);}
 .att-row:last-child{border-bottom:none;}
 .att-name{font-size:14px;font-weight:500;flex:1;line-height:1.3;}
 .att-btns{display:flex;gap:5px;flex-shrink:0;}
@@ -217,7 +265,8 @@ tr:hover td{background:var(--card2);}
 .att-btn.inactive:active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
 
 /* FEE ROW */
-.fee-row{display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);gap:8px;}
+.fee-row{display:flex;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);gap:8px;transition:background .15s ease;}
+.fee-row:hover{background:var(--card2);}
 .fee-row:last-child{border-bottom:none;}
 .fee-name{flex:1;font-size:13px;font-weight:600;line-height:1.3;}
 
@@ -241,7 +290,8 @@ tr:hover td{background:var(--card2);}
 
 /* NAV ARROWS */
 .nav-arrows{display:flex;align-items:center;gap:6px;}
-.arrow-btn{background:var(--card2);border:1px solid var(--border);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;}
+.arrow-btn{background:var(--card2);border:1px solid var(--border);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;transition:background .15s, color .15s, border-color .15s;}
+.arrow-btn:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
 .nav-val{font-size:12px;font-weight:600;color:var(--offwhite);min-width:60px;text-align:center;}
 
 /* OVERVIEW POPUP */
@@ -297,17 +347,18 @@ tr:hover td{background:var(--card2);}
 
 /* MONTH-YEAR PILL NAVIGATOR */
 .my-nav{display:flex;align-items:center;justify-content:center;gap:0;background:var(--card2);border:1px solid var(--border);border-radius:12px;overflow:hidden;width:100%;}
-.my-nav-btn{background:var(--accent);border:none;color:var(--offwhite);font-size:15px;font-weight:700;padding:9px 13px;cursor:pointer;transition:background .15s;flex-shrink:0;line-height:1;}
-.my-nav-btn:active{background:var(--accent2);}
+.my-nav-btn{background:transparent;border:none;color:var(--graydk);font-size:15px;font-weight:700;padding:9px 13px;cursor:pointer;transition:background .15s, color .15s;flex-shrink:0;line-height:1;}
+.my-nav-btn:hover{background:var(--accent);color:#ffffff;}
+.my-nav-btn:active{background:var(--accent2);color:#ffffff;}
 .my-nav-btn.yr{font-size:13px;padding:9px 10px;}
 .my-nav-label{flex:1;text-align:center;font-size:17px;font-weight:800;color:var(--gold);letter-spacing:.5px;padding:9px 4px;cursor:default;user-select:none;white-space:nowrap;}
 
 /* Force ₹ symbol to render correctly across all devices */
 .rupee::before { content: '\20B9'; font-family: 'Noto Sans', 'Roboto', 'Arial Unicode MS', sans-serif; }
-body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, sans-serif; }
+body { font-family: 'Poppins', 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, sans-serif; }
 
 /* Login error */
-.login-error{display:none;background:#7f1d1d55;border:1px solid #ef444488;color:#fca5a5;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;text-align:left;}
+.login-error{display:none;background:#fde8e8;border:1px solid #f5b5b5;color:#b91c1c;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:12px;text-align:left;}
 .login-error.show{display:block;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
 .login-shake{animation:shake .4s ease;}
@@ -337,14 +388,45 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen">
+  <div class="star" style="width:2px;height:2px;top:12%;left:18%;animation-duration:2.8s;"></div>
+  <div class="star" style="width:3px;height:3px;top:22%;left:70%;animation-duration:3.5s;animation-delay:.5s;"></div>
+  <div class="star" style="width:2px;height:2px;top:35%;left:42%;animation-duration:2.4s;animation-delay:1s;"></div>
+  <div class="star" style="width:2px;height:2px;top:8%;left:85%;animation-duration:3.1s;animation-delay:.3s;"></div>
+  <div class="star" style="width:3px;height:3px;top:55%;left:10%;animation-duration:4s;animation-delay:1.4s;"></div>
+  <div class="star" style="width:2px;height:2px;top:68%;left:80%;animation-duration:2.9s;animation-delay:.8s;"></div>
+  <div class="star" style="width:2px;height:2px;top:78%;left:30%;animation-duration:3.4s;animation-delay:2s;"></div>
+  <div class="star" style="width:3px;height:3px;top:48%;left:60%;animation-duration:3.7s;animation-delay:.2s;"></div>
+  <div class="star" style="width:2px;height:2px;top:88%;left:55%;animation-duration:2.6s;animation-delay:1.6s;"></div>
+  <div class="star" style="width:2px;height:2px;top:30%;left:90%;animation-duration:3.3s;animation-delay:1.1s;"></div>
+  <div class="star" style="width:2px;height:2px;top:62%;left:38%;animation-duration:2.7s;animation-delay:.6s;"></div>
+  <div class="star" style="width:3px;height:3px;top:18%;left:50%;animation-duration:4.2s;animation-delay:2.3s;"></div>
+  <div class="meteor m1"></div>
+  <div class="meteor m2"></div>
+  <div class="meteor m3"></div>
+  <div class="meteor m4"></div>
+  <div class="meteor m5"></div>
   <div class="login-box">
-    <div class="login-logo" id="loginLogo">⚔️</div>
-    <div class="login-title" id="loginAcadTitle">MEELKAZHANI SILAMBAM ACADEMY</div>
-    <div class="login-sub" id="loginTagline">Admin &amp; Staff Portal</div>
+    <div class="login-logo" id="loginLogo"><svg viewBox="0 0 24 24" fill="#e8392f" width="40" height="40"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg></div>
+    <div class="login-title" id="loginAcadTitle">Welcome Back</div>
+    <div class="login-sub" id="loginTagline">Sign in to your account</div>
     <div class="login-error" id="loginError">⚠️ <span id="loginErrorMsg">Invalid ID or password. Please try again.</span></div>
-    <div class="login-field"><label>User ID</label><input type="text" id="loginId" placeholder="Enter your user ID (e.g. admin01)" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()" oninput="clearLoginError()"></div>
-    <div class="login-field"><label>Password</label><input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" oninput="clearLoginError()"></div>
-    <button class="btn-login" id="loginBtn" onclick="doLogin()">Login →</button>
+    <div class="login-field">
+      <label>Email / User ID Address</label>
+      <div class="field-wrap">
+        <span class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#e8392f" stroke-width="2" width="17" height="17"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg></span>
+        <input type="text" id="loginId" placeholder="Enter your email or user ID" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()" oninput="clearLoginError()">
+      </div>
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <div class="field-wrap">
+        <span class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#e8392f" stroke-width="2" width="17" height="17"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()" oninput="clearLoginError()">
+        <button type="button" class="login-eye" onclick="toggleLoginPass()" title="Show/hide password"><svg viewBox="0 0 24 24" fill="none" stroke="#e8392f" stroke-width="2" width="17" height="17"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()">Sign In to Portal</button>
+    <div class="login-support" id="loginSupport"></div>
   </div>
 </div>
 
@@ -403,7 +485,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
     <div class="page active" id="pageHome" style="display:flex;flex-direction:column;overflow-y:auto;padding-bottom:72px;">
       <!-- Dashboard Title + Month/Year Filter -->
       <div style="margin-bottom:12px;">
-        <div class="section-title" style="margin-bottom:8px;">📊 Dashboard</div>
+        <div class="section-title" style="margin-bottom:8px;">📈 Dashboard</div>
         <!-- Hidden selects for JS value storage -->
         <select id="dashMonth" onchange="loadDashboard()" style="display:none;"></select>
         <select id="dashYear"  onchange="loadDashboard()" style="display:none;"></select>
@@ -418,25 +500,25 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       </div>
 
       <div class="stats-grid" style="flex-shrink:0;">
-        <div class="stat-card">
-          <div class="stat-icon" style="background:#2563eb22;">👥</div>
+        <div class="stat-card grad stat-blue">
+          <div class="stat-icon">👥</div>
           <div class="stat-label">Total Students</div>
-          <div class="stat-val" style="color:#60a5fa;" id="statTotal">0</div>
+          <div class="stat-val" id="statTotal">0</div>
         </div>
-        <div class="stat-card" id="statCollectedCard">
-          <div class="stat-icon" style="background:#16a34a22;">✅</div>
+        <div class="stat-card grad stat-green" id="statCollectedCard">
+          <div class="stat-icon">✅</div>
           <div class="stat-label">Fees Collected</div>
-          <div class="stat-val" style="color:#4ade80;font-size:16px;" id="statCollected">0</div>
+          <div class="stat-val" style="font-size:16px;" id="statCollected">0</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background:#dc262622;">⚠️</div>
+        <div class="stat-card grad stat-red">
+          <div class="stat-icon">⚠️</div>
           <div class="stat-label">Fee Pending</div>
-          <div class="stat-val" style="color:#f87171;" id="statPending">0</div>
+          <div class="stat-val" id="statPending">0</div>
         </div>
-        <div class="stat-card" onclick="showJoinedStudents()" style="cursor:pointer;" title="Click to see joined students">
-          <div class="stat-icon" style="background:#d9770622;">🆕</div>
+        <div class="stat-card grad stat-orange" onclick="showJoinedStudents()" style="cursor:pointer;" title="Click to see joined students">
+          <div class="stat-icon">🆕</div>
           <div class="stat-label" id="statJoinedLabel">Joined</div>
-          <div class="stat-val" style="color:#fb923c;" id="statTodayPresent">0</div>
+          <div class="stat-val" id="statTodayPresent">0</div>
         </div>
       </div>
 
@@ -474,17 +556,9 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
               <button id="homeTileBtnStr" onclick="setHomeTileMode('joined')"
                 style="padding:3px 9px;border-radius:5px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--gray);transition:all .15s;">Str</button>
             </div>
-            <!-- Months selector -->
-            <select id="homeTileMonths" onchange="renderHomeTileChart()"
-              style="background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-size:11px;font-weight:700;padding:3px 5px;outline:none;cursor:pointer;">
-              <option value="3">3mo</option>
-              <option value="6" selected>6mo</option>
-              <option value="9">9mo</option>
-              <option value="12">12mo</option>
-            </select>
           </div>
         </div>
-        <div style="overflow-x:auto;overflow-y:hidden;">
+        <div style="overflow:hidden;">
           <canvas id="homeTileCanvas" style="display:block;"></canvas>
         </div>
         <div style="text-align:right;margin-top:6px;">
@@ -500,13 +574,6 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         <button onclick="closeChartMax()" title="Back to Home"
           style="background:var(--card2);border:1px solid var(--border);color:var(--offwhite);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;flex-shrink:0;">‹</button>
         <div style="font-size:14px;font-weight:700;color:var(--gold);flex:1;" id="chartMaxTitle">📊 Chart</div>
-        <!-- View orientation toggle -->
-        <div style="display:flex;gap:4px;background:var(--royal);border-radius:8px;padding:3px;">
-          <button id="chartMaxBtnV" onclick="setChartMaxOrientation('vertical')"
-            style="padding:4px 10px;border-radius:6px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:var(--accent2);color:#fff;transition:all .15s;" title="Vertical bars">⬆ Vert</button>
-          <button id="chartMaxBtnH" onclick="setChartMaxOrientation('horizontal')"
-            style="padding:4px 10px;border-radius:6px;border:none;font-size:10px;font-weight:700;cursor:pointer;background:transparent;color:var(--gray);transition:all .15s;" title="Horizontal bars">➡ Horiz</button>
-        </div>
       </div>
       <!-- Controls row -->
       <div style="padding:8px 14px;background:var(--royal2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;">
@@ -600,7 +667,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
         </div>
         <button class="btn btn-xs btn-outline" onclick="selectAllStudents()" style="font-size:11px;">✅ Select All</button>
         <button class="btn btn-xs btn-outline" onclick="clearStudentSelection()" style="font-size:11px;">✕ Deselect All</button>
-        <button class="btn btn-xs btn-gold" onclick="openBulkEditModal()" style="font-size:11px;">✏️ Bulk Edit</button>
+        <button class="btn btn-xs btn-outline" onclick="openBulkEditModal()" style="font-size:11px;">✏️ Bulk Edit</button>
       </div>
 
       <div id="studentListWrap" style="flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:72px;"></div>
@@ -611,25 +678,6 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;">
         <div class="section-title" style="margin-bottom:0;">📅 Attendance</div>
         <div style="display:flex;gap:5px;align-items:center;">
-          <div style="position:relative;">
-            <button class="btn btn-outline btn-sm" id="attOverviewBtn" onclick="toggleOverview(event)">📊</button>
-            <div class="overview-popup" id="attOverviewPopup">
-              <div class="wheel-container">
-                <svg class="wheel-svg" width="130" height="130" viewBox="0 0 110 110" id="wheelSvg">
-                  <circle cx="55" cy="55" r="44" fill="none" stroke="#1e3a5f" stroke-width="18"/>
-                  <circle cx="55" cy="55" r="44" fill="none" stroke="#4ade80" stroke-width="18" stroke-dasharray="0 276.5" id="wP" stroke-linecap="round"/>
-                  <circle cx="55" cy="55" r="44" fill="none" stroke="#f87171" stroke-width="18" stroke-dasharray="0 276.5" id="wA" stroke-linecap="round"/>
-                  <circle cx="55" cy="55" r="44" fill="none" stroke="#94a3b8" stroke-width="18" stroke-dasharray="0 276.5" id="wL" stroke-linecap="round"/>
-                </svg>
-                <div class="wheel-center"><div class="wheel-total" id="wTotal">0</div><div class="wheel-label">Students</div></div>
-              </div>
-              <div style="margin-top:10px;font-size:12px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:#4ade80;">● Present</span><span id="wPNum">0</span></div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span style="color:#f87171;">● Absent</span><span id="wANum">0</span></div>
-                <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">● Leave</span><span id="wLNum">0</span></div>
-              </div>
-            </div>
-          </div>
           <button class="btn btn-gold btn-sm" onclick="downloadAttendance('pdf')">PDF</button>
           <button class="btn btn-success btn-sm" onclick="downloadAttendance('xl')">XL</button>
         </div>
@@ -830,6 +878,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="section-title" style="margin-bottom:0;">👤 Profile</div>
         <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" id="themeToggleBtn" onclick="toggleTheme()" title="Switch theme">🌙 Dark</button>
           <button class="btn btn-outline btn-sm" onclick="openSettingsModal()" title="Settings">⚙️ Settings</button>
           <button class="btn btn-danger btn-sm" onclick="doLogout()">Logout</button>
         </div>
@@ -875,6 +924,9 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
           </div>
           <div class="form-group"><label class="form-label">Tagline / Subtitle</label>
             <input type="text" class="form-input" id="changeTagline" placeholder="e.g. Admin & Staff Portal">
+          </div>
+          <div class="form-group"><label class="form-label">Login Page Support Line <span style="font-size:10px;color:var(--gray);">(shown at bottom of login)</span></label>
+            <input type="text" class="form-input" id="changeLoginSupport" placeholder="e.g. Support: name@email.com | +91 XXXXXXXXXX">
           </div>
 
           <!-- Login Background -->
@@ -1483,7 +1535,7 @@ body { font-family: 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode MS', Arial, 
 // DATABASE
 // ================================================================
 let DB = {
-  settings: { academyName:'MEELKAZHANI SILAMBAM ACADEMY', logoUrl:'', email:'', phone:'', tagline:'Admin & Staff Portal', loginBgUrl:'', firebaseUrl:'', lastPush:'', lastPushBy:'', msgTemplate:'Dear {name}, your fee for {month} is pending at {academy}. Kindly pay at the earliest. Thank you.' },
+  settings: { academyName:'MEELKAZHANI SILAMBAM ACADEMY', logoUrl:'', email:'', phone:'', tagline:'Admin & Staff Portal', loginBgUrl:'', loginSupport:'', firebaseUrl:'', lastPush:'', lastPushBy:'', msgTemplate:'Dear {name}, your fee for {month} is pending at {academy}. Kindly pay at the earliest. Thank you.' },
   users: [
     { id:'admin', email:'admin@youracademy.com', name:'Admin', role:'admin' },
     { id:'staff1', email:'staff1@youracademy.com', name:'Staff 1', role:'staff' }
@@ -1660,10 +1712,10 @@ function renderEnquiryList() {
       ? `<span class="badge badge-gray" style="font-size:10px;">✍️ ${escHtml(q.createdBy)}</span>`
       : '';
     return `
-    <div onclick="openEnquiryDetail('${escHtml(q.id)}')"
+    <div onclick="openEnquiryDetail('${escHtml(q.id)}')" class="hover-lift"
          style="display:flex;align-items:center;justify-content:space-between;background:var(--card);
                 border:1px solid ${isOverdue?'#ef444455':'var(--border)'};border-radius:10px;padding:12px 14px;
-                margin-bottom:7px;cursor:pointer;gap:10px;transition:border-color .2s;">
+                margin-bottom:7px;cursor:pointer;gap:10px;transition:border-color .2s, transform .15s ease, box-shadow .15s ease;">
       <div style="display:flex;align-items:center;gap:11px;min-width:0;flex:1;">
         <div style="width:38px;height:38px;border-radius:50%;background:var(--accent2);
                     display:flex;align-items:center;justify-content:center;
@@ -2236,6 +2288,10 @@ function clearLoginError() {
   const pwEl = document.getElementById('loginPass');
   if (idEl) idEl.style.borderColor = '';
   if (pwEl) pwEl.style.borderColor = '';
+}
+function toggleLoginPass() {
+  const pw = document.getElementById('loginPass');
+  if (pw) pw.type = pw.type === 'password' ? 'text' : 'password';
 }
 function showLoginError(msg) {
   const el = document.getElementById('loginError');
@@ -3083,6 +3139,18 @@ function getBannedStudents() {
 }
 // Returns true if the student was already enrolled ON or BEFORE the given date.
 // day=0 means "check the whole month" — student must have joined before end of that month.
+// Returns true if the student was NOT yet dropped on the given date.
+// A dropped student still appears for dates before their drop date.
+function isActiveOnDate(student, year, month, day) {
+  if (!student.banned) return true;
+  if (!student.bannedOn) return false; // dropped but no date — hide everywhere
+  const dropped = new Date(student.bannedOn);
+  dropped.setHours(0,0,0,0);
+  const checkD = new Date(year, month-1, day || daysInMonth(year, month));
+  checkD.setHours(0,0,0,0);
+  return checkD < dropped; // active only strictly before the drop date
+}
+
 function isEnrolledOnDate(student, year, month, day) {
   if (!student.joinDate) return true;
   const jd = parseDate(student.joinDate);
@@ -3856,10 +3924,9 @@ function renderStudentList() {
             style="width:17px;height:17px;accent-color:var(--accent2);cursor:pointer;flex-shrink:0;">
         </label>
         <div style="display:flex;align-items:flex-start;gap:8px;flex:1;min-width:0;">
-          <div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold);margin-top:1px;">${num}</div>
           <div style="flex:1;min-width:0;">
             <div style="font-size:14px;font-weight:700;display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-              ${s.rollNo ? `<span style="background:var(--gold);color:var(--royal);border-radius:5px;padding:1px 7px;font-size:11px;font-weight:800;">${s.rollNo}</span>` : ''}
+              ${s.rollNo ? `<span style="background:var(--accent2);color:#fff;border-radius:50%;min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;padding:0 4px;">${s.rollNo}</span>` : ''}
               <span>${escHtml(s.name)}</span>
               ${isBanned?'<span class="badge badge-red">Dropout</span>':''}
               <span class="badge badge-blue">${escHtml(s.batch||'')}</span>
@@ -3875,7 +3942,7 @@ function renderStudentList() {
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
-          <button class="btn btn-outline btn-xs" onclick="openAddStudentModal('${s.id}')">✏️ Edit</button>
+          <button class="btn btn-primary btn-xs" onclick="openAddStudentModal('${s.id}')">✏️ Edit</button>
           <button class="btn btn-danger btn-xs" onclick="deleteStudent('${s.id}')">🗑️ Delete</button>
           ${!isBanned?`<button class="btn btn-warning btn-xs" onclick="banStudent('${s.id}')">🚫 Block</button>`
             :`<button class="btn btn-success btn-xs" onclick="unbanStudent('${s.id}')">✅ Restore</button>`}
@@ -4144,9 +4211,9 @@ function markAllAttendance(dateKey, status, checked) {
   const m = parseInt(dateKey.split('-')[1]);
   const d = parseInt(dateKey.split('-')[2]);
   const batch = selectedBatch.att;
-  let students = getActiveStudents();
+  let students = [...DB.students];
   if (batch !== 'ALL') students = students.filter(s => s.batch === batch);
-  const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d));
+  const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d) && isActiveOnDate(s, y, m, d));
   if (!enrolled.length) { renderAttendance(); return; }
 
   const label = status === 'P' ? 'Present' : 'Absent';
@@ -4189,10 +4256,10 @@ function renderAttendance() {
   const d = parseInt(document.getElementById('attDate').value);
   const batch = selectedBatch.att;
 
-  // Get students: only active, filtered by batch, search, filter by enrollment date
+  // Get students: active + recently-dropped (for past dates), filtered by batch & search
   const attSearch = (document.getElementById('attSearch')?.value || '').toLowerCase();
   const attStatusFilter = document.getElementById('attStatusFilter')?.value || 'all';
-  let students = getActiveStudents();
+  let students = [...DB.students];
   if (batch !== 'ALL') students = students.filter(s => s.batch === batch);
   if (attSearch) students = students.filter(s => s.name.toLowerCase().includes(attSearch) || (s.contact||'').includes(attSearch));
 
@@ -4205,8 +4272,8 @@ function renderAttendance() {
     const dayData = DB.attendance[dateKey] || {};
     const classDay = isClassDay(dateKey);
 
-    // Only enrolled students — sorted by roll number
-    const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d))
+    // Enrolled (joined on/before) AND active (not yet dropped) on this date — sorted by roll number
+    const enrolled = students.filter(s => isEnrolledOnDate(s, y, m, d) && isActiveOnDate(s, y, m, d))
       .sort((a, b) => (parseInt(a.rollNo)||9999) - (parseInt(b.rollNo)||9999) || a.name.localeCompare(b.name));
 
     // Summary counts
@@ -4265,7 +4332,7 @@ function renderAttendance() {
         if (attStatusFilter === 'absent'  && v !== 'A') return;
         html += `<div class="att-row">
           <div class="att-name">
-            ${s.rollNo ? `<span style="background:var(--gold);color:var(--royal);border-radius:4px;padding:0px 5px;font-size:10px;font-weight:800;margin-right:4px;">${s.rollNo}</span>` : ''}${escHtml(s.name)}<br>
+            ${s.rollNo ? `<span style="background:var(--accent2);color:#fff;border-radius:50%;min-width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;padding:0 4px;margin-right:5px;vertical-align:middle;">${s.rollNo}</span>` : ''}<span style="font-weight:700;">${escHtml(s.name)}</span><br>
             <span style="font-size:10px;color:var(--gray);">${escHtml(s.batch||'')}</span>
           </div>
           <div class="att-btns">
@@ -5154,6 +5221,38 @@ function _buildMonthRange(selM, selY, numMonths, numYears) {
   return months;
 }
 
+function _buildChartDataDaily(m, y, mode) {
+  const actives = getActiveStudents();
+  const blocked = getBannedStudents();
+  const allStudents = DB.students;
+  const dim = daysInMonth(y, m);
+  // If viewing the current month, only show days up to today
+  const now = new Date();
+  const isCurrentMonth = (y === now.getFullYear() && m === now.getMonth() + 1);
+  const lastDay = isCurrentMonth ? Math.min(now.getDate(), dim) : dim;
+  const out = [];
+  for (let day = 1; day <= lastDay; day++) {
+    const dateKey = `${y}-${pad(m)}-${pad(day)}`;
+    const label = String(day);
+    if (mode === 'present') {
+      const dayData = DB.attendance[dateKey] || {};
+      const enrolled = allStudents.filter(s => isEnrolledOnKey(s, dateKey) && isActiveOnDate(s, y, m, day));
+      let present = 0, absent = 0;
+      enrolled.forEach(s => {
+        const v = dayData[s.id];
+        if (v === 'P') present++;
+        else if (v === 'A') absent++;
+      });
+      out.push({ onTime: present, notOnTime: absent, label });
+    } else {
+      const enrolledActive  = actives.filter(s => isEnrolledOnKey(s, dateKey) && isActiveOnDate(s, y, m, day));
+      const enrolledDropped = blocked.filter(s => isEnrolledOnKey(s, dateKey) && !isActiveOnDate(s, y, m, day));
+      out.push({ onTime: enrolledActive.length, notOnTime: enrolledDropped.length, label });
+    }
+  }
+  return out;
+}
+
 function _buildChartData(months, mode) {
   const actives = getActiveStudents();
   const blocked = getBannedStudents();
@@ -5250,12 +5349,10 @@ function renderHomeTileChart() {
   const ySel = document.getElementById('dashYear');
   const selM = mSel ? parseInt(mSel.value) : new Date().getMonth() + 1;
   const selY = ySel ? parseInt(ySel.value) : new Date().getFullYear();
-  const numMonths = parseInt(document.getElementById('homeTileMonths')?.value || 6);
 
-  const months = _buildMonthRange(selM, selY, numMonths, 1);
-  const data   = _buildChartData(months, homeTileMode);
+  // Daily data for the selected month
+  const data = _buildChartDataDaily(selM, selY, homeTileMode);
 
-  // Draw using stacked bars (same as existing function, compact height)
   _drawHomeTileBars(canvas, data, homeTileMode);
 }
 
@@ -5263,8 +5360,8 @@ function _drawHomeTileBars(canvas, data, mode) {
   const dpr = window.devicePixelRatio || 1;
   const containerW = canvas.parentElement.offsetWidth || 300;
   const H = 160;
-  // Each month group needs space for 2 side-by-side bars
-  const W = Math.max(containerW, data.length * 44);
+  // Line chart fits the container — no horizontal scroll
+  const W = containerW;
 
   canvas.width  = W * dpr;
   canvas.height = H * dpr;
@@ -5281,62 +5378,128 @@ function _drawHomeTileBars(canvas, data, mode) {
   const chartH = H - padT - padB;
   const nGroups  = data.length;
   const groupW = chartW / nGroups;
-  const outerGap = 4;  // gap between groups
-  const innerGap = 2;  // gap between the two bars within a group
-  const totalBarW = groupW - outerGap * 2;
-  const barW = (totalBarW - innerGap) / 2;
   const maxVal = Math.max(...data.map(d => Math.max(d.onTime, d.notOnTime)), 1);
-  const rx = 3;
 
-  const col1 = mode === 'present' ? '#22c55e' : '#2563eb'; // bar 1: present / joined
-  const col2 = mode === 'present' ? '#f87171' : '#ef4444'; // bar 2: absent / blocked
+  // Line 1 = present/active (green/blue), Line 2 = absent/dropped (orange/red)
+  const col1 = mode === 'present' ? '#4caf8e' : '#5b7cc4';
+  const fill1 = mode === 'present' ? 'rgba(76,175,142,0.12)' : 'rgba(91,124,196,0.12)';
+  const col2 = mode === 'present' ? '#e06b6b' : '#e0a05a';
 
-  // Grid lines
-  ctx.strokeStyle = 'rgba(30,58,95,0.6)'; ctx.lineWidth = 0.7;
+  // Y-axis labels only (no horizontal gridlines)
   for (let i = 0; i <= 4; i++) {
     const gY = padT + (chartH / 4) * i;
-    ctx.beginPath(); ctx.moveTo(padL, gY); ctx.lineTo(padL + chartW, gY); ctx.stroke();
-    ctx.fillStyle = 'rgba(148,163,184,0.65)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(90,105,130,0.9)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'right';
     ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), padL - 3, gY + 3);
   }
 
-  const drawBar = (x, w, h, col, label) => {
-    if (h <= 0) return;
-    const by = padT + chartH - h;
-    ctx.fillStyle = col;
+  const xOf = (i) => padL + i * groupW + groupW / 2;
+  const yOf = (val) => padT + chartH - (val / maxVal * chartH);
+
+  // Build points for both series
+  const pts1 = data.map((d, i) => ({ x: xOf(i), y: yOf(d.onTime),   v: d.onTime }));
+  const pts2 = data.map((d, i) => ({ x: xOf(i), y: yOf(d.notOnTime), v: d.notOnTime }));
+
+  const buildCurve = (pts) => {
     ctx.beginPath();
-    ctx.moveTo(x + rx, by);
-    ctx.lineTo(x + w - rx, by);
-    ctx.quadraticCurveTo(x + w, by, x + w, by + rx);
-    ctx.lineTo(x + w, by + h);
-    ctx.lineTo(x, by + h);
-    ctx.lineTo(x, by + rx);
-    ctx.quadraticCurveTo(x, by, x + rx, by);
-    ctx.fill();
-    if (h > fs + 3 && label > 0) {
-      ctx.fillStyle = '#fff';
-      ctx.font = `bold ${fs}px sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText(label, x + w / 2, by + h / 2 + fs / 2 - 1);
-    }
+    pts.forEach((p, i) => {
+      if (i === 0) { ctx.moveTo(p.x, p.y); return; }
+      const prev = pts[i - 1];
+      const cx = (prev.x + p.x) / 2;
+      ctx.bezierCurveTo(cx, prev.y, cx, p.y, p.x, p.y);
+    });
   };
 
+  // Fill under line 1
+  if (pts1.length > 1) {
+    buildCurve(pts1);
+    ctx.lineTo(pts1[pts1.length - 1].x, padT + chartH);
+    ctx.lineTo(pts1[0].x, padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = fill1;
+    ctx.fill();
+  }
+
+  // Draw a line series with dots
+  const drawSeries = (pts, color) => {
+    if (pts.length > 1) {
+      buildCurve(pts);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.3;
+      ctx.stroke();
+    });
+  };
+
+  drawSeries(pts1, col1);
+  drawSeries(pts2, col2);
+
+  // X-axis labels (skip some if crowded)
+  const skip = nGroups > 16 ? Math.ceil(nGroups / 12) : 1;
   data.forEach((d, i) => {
-    const groupX = padL + i * groupW + outerGap;
-    const x1 = groupX;
-    const x2 = groupX + barW + innerGap;
-    const h1 = d.onTime    / maxVal * chartH;
-    const h2 = d.notOnTime / maxVal * chartH;
-
-    drawBar(x1, barW, h1, col1, d.onTime);
-    drawBar(x2, barW, h2, col2, d.notOnTime);
-
-    // X-axis label centred under the group
-    ctx.fillStyle = 'rgba(148,163,184,0.85)';
+    if (i % skip !== 0 && i !== nGroups - 1) return;
+    ctx.fillStyle = 'rgba(90,105,130,0.95)';
     ctx.font = `${fs}px sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(d.label, padL + i * groupW + groupW / 2, H - padB + fs + 5);
+    ctx.fillText(d.label, xOf(i), H - padB + fs + 5);
   });
+
+  // Store points and bind hover/tap for the dashboard chart
+  const labelP = mode === 'present' ? 'Present' : 'Active';
+  const labelN = mode === 'present' ? 'Absent' : 'Dropped';
+  _homeTilePts = {
+    pts1: pts1.map((p, i) => ({ ...p, v: data[i].onTime, label: data[i].label })),
+    pts2: pts2.map((p, i) => ({ ...p, v: data[i].notOnTime, label: data[i].label })),
+    col1, col2, labelP, labelN, W
+  };
+  if (!canvas._tapBound) {
+    canvas._tapBound = true;
+    const handler = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+      const cy = (ev.touches ? ev.touches[0].clientY : ev.clientY) - rect.top;
+      _showHomeTileTooltip(canvas, cx, cy);
+    };
+    canvas.addEventListener('click', handler);
+    canvas.addEventListener('touchstart', handler, { passive: true });
+    canvas.addEventListener('mousemove', handler);
+    canvas.addEventListener('mouseleave', () => { const t=document.getElementById('homeTileTooltip'); if(t) t.style.display='none'; });
+  }
+}
+
+let _homeTilePts = null;
+function _showHomeTileTooltip(canvas, cx, cy) {
+  if (!_homeTilePts) return;
+  const { pts1, pts2, col1, col2, labelP, labelN, W } = _homeTilePts;
+  let best = null, bestDist = 9999;
+  const consider = (p, color, kind) => {
+    const dx = p.x - cx, dy = p.y - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < bestDist) { bestDist = dist; best = { p, color, kind }; }
+  };
+  pts1.forEach(p => consider(p, col1, labelP));
+  pts2.forEach(p => consider(p, col2, labelN));
+  let tip = document.getElementById('homeTileTooltip');
+  if (!best || bestDist > 26) { if (tip) tip.style.display='none'; return; }
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'homeTileTooltip';
+    tip.style.cssText = 'position:absolute;background:#1a2233;color:#fff;font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;pointer-events:none;z-index:50;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.25);';
+    canvas.parentElement.style.position = 'relative';
+    canvas.parentElement.appendChild(tip);
+  }
+  tip.innerHTML = `<span style="color:${best.color};">●</span> ${best.kind}: ${best.p.v} (Day ${best.p.label})`;
+  tip.style.left = Math.min(best.p.x + 6, W - 110) + 'px';
+  tip.style.top  = Math.max(best.p.y - 26, 2) + 'px';
+  tip.style.display = 'block';
 }
 // ─────────────────────────────────────────────────────────────────
 
@@ -5359,13 +5522,139 @@ function renderChartMax() {
   if (leg2) { leg2.style.display='flex'; const sp=leg2.querySelector('span'); if(sp) sp.style.background=chartMaxMode==='present'?'#f97316':'#ef4444'; if(leg2.lastChild) leg2.lastChild.textContent=chartMaxMode==='present'?' Not Attended':' Blocked'; }
 
   const months = _buildMonthRange(selM, selY, numMonths, numYears);
-  const data = _buildChartData(months, chartMaxMode);
+  // Use daily data for the selected month with line chart
+  const data = _buildChartDataDaily(selM, selY, chartMaxMode);
+  _drawLineChartMax(canvas, data, chartMaxMode);
+}
 
-  if (chartMaxOrientation === 'horizontal') {
-    _drawHorizontalBars(canvas, data, chartMaxMode);
-  } else {
-    _drawStackedBars(canvas, data, chartMaxMode, true);
+// Line chart for the expanded view, with tap-to-show count
+let _chartMaxPts = null;
+function _drawLineChartMax(canvas, data, mode) {
+  const dpr = window.devicePixelRatio || 1;
+  const containerW = canvas.parentElement.offsetWidth || 320;
+  const containerH = canvas.parentElement.offsetHeight || 360;
+  const W = containerW, H = containerH;
+
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  const fs = 11;
+  const padL = 36, padR = 14, padT = 18, padB = 36;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const n = data.length;
+  const maxVal = Math.max(...data.map(d => Math.max(d.onTime, d.notOnTime)), 1);
+
+  const col1 = mode === 'present' ? '#4caf8e' : '#5b7cc4';
+  const fill1 = mode === 'present' ? 'rgba(76,175,142,0.12)' : 'rgba(91,124,196,0.12)';
+  const col2 = mode === 'present' ? '#e06b6b' : '#e0a05a';
+
+  for (let i = 0; i <= 4; i++) {
+    const gY = padT + (chartH / 4) * i;
+    ctx.fillStyle = 'rgba(90,105,130,0.9)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'right';
+    ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), padL - 4, gY + 4);
   }
+
+  const xOf = (i) => padL + (n > 1 ? (chartW / (n - 1)) * i : chartW / 2);
+  const yOf = (val) => padT + chartH - (val / maxVal * chartH);
+
+  const pts1 = data.map((d, i) => ({ x: xOf(i), y: yOf(d.onTime),   v: d.onTime,   label: d.label }));
+  const pts2 = data.map((d, i) => ({ x: xOf(i), y: yOf(d.notOnTime), v: d.notOnTime, label: d.label }));
+
+  const buildCurve = (pts) => {
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      if (i === 0) { ctx.moveTo(p.x, p.y); return; }
+      const prev = pts[i - 1];
+      const cx = (prev.x + p.x) / 2;
+      ctx.bezierCurveTo(cx, prev.y, cx, p.y, p.x, p.y);
+    });
+  };
+
+  if (pts1.length > 1) {
+    buildCurve(pts1);
+    ctx.lineTo(pts1[pts1.length - 1].x, padT + chartH);
+    ctx.lineTo(pts1[0].x, padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = fill1; ctx.fill();
+  }
+
+  const drawSeries = (pts, color) => {
+    if (pts.length > 1) {
+      buildCurve(pts);
+      ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke();
+    }
+    pts.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
+      ctx.fillStyle = color; ctx.fill();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+    });
+  };
+  drawSeries(pts1, col1);
+  drawSeries(pts2, col2);
+
+  const skip = n > 16 ? Math.ceil(n / 12) : 1;
+  data.forEach((d, i) => {
+    if (i % skip !== 0 && i !== n - 1) return;
+    ctx.fillStyle = 'rgba(90,105,130,0.95)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'center';
+    ctx.fillText(d.label, xOf(i), H - padB + fs + 6);
+  });
+
+  // Store points for tap detection
+  _chartMaxPts = { pts1, pts2, col1, col2, mode, W, H, padT, padB, chartH };
+
+  // Attach tap/hover handler once
+  if (!canvas._tapBound) {
+    canvas._tapBound = true;
+    const handler = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+      const cy = (ev.touches ? ev.touches[0].clientY : ev.clientY) - rect.top;
+      _showChartMaxTooltip(canvas, cx, cy);
+    };
+    canvas.addEventListener('click', handler);
+    canvas.addEventListener('touchstart', handler, { passive: true });
+    canvas.addEventListener('mousemove', handler);
+    canvas.addEventListener('mouseleave', _hideChartMaxTooltip);
+  }
+}
+
+function _showChartMaxTooltip(canvas, cx, cy) {
+  if (!_chartMaxPts) return;
+  const { pts1, pts2, col1, col2, mode } = _chartMaxPts;
+  // Find nearest point across both series
+  let best = null, bestDist = 9999;
+  const consider = (p, color, kind) => {
+    const dx = p.x - cx, dy = p.y - cy;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < bestDist) { bestDist = dist; best = { p, color, kind }; }
+  };
+  pts1.forEach(p => consider(p, col1, mode==='present'?'Present':'Active'));
+  pts2.forEach(p => consider(p, col2, mode==='present'?'Absent':'Dropped'));
+  if (!best || bestDist > 30) { _hideChartMaxTooltip(); return; }
+
+  let tip = document.getElementById('chartMaxTooltip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'chartMaxTooltip';
+    tip.style.cssText = 'position:absolute;background:#1a2233;color:#fff;font-size:12px;font-weight:700;padding:5px 9px;border-radius:7px;pointer-events:none;z-index:50;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.25);';
+    canvas.parentElement.style.position = 'relative';
+    canvas.parentElement.appendChild(tip);
+  }
+  tip.innerHTML = `<span style="color:${best.color};">●</span> ${best.kind}: ${best.p.v} (Day ${best.p.label})`;
+  tip.style.left = Math.min(best.p.x + 8, _chartMaxPts.W - 120) + 'px';
+  tip.style.top  = Math.max(best.p.y - 30, 4) + 'px';
+  tip.style.display = 'block';
+}
+function _hideChartMaxTooltip() {
+  const tip = document.getElementById('chartMaxTooltip');
+  if (tip) tip.style.display = 'none';
 }
 
 // Single stacked bar chart (for home dashboard)
@@ -5400,79 +5689,82 @@ function _drawStackedBars(canvas, data, mode, isMax) {
   const col1 = mode === 'present' ? '#22c55e' : '#2563eb'; // bottom segment
   const col2 = mode === 'present' ? '#f97316' : '#ef4444'; // top segment
 
-  // Grid
-  ctx.strokeStyle = 'rgba(30,58,95,0.7)'; ctx.lineWidth = 0.8;
+  // Y-axis labels only (no horizontal gridlines)
   for (let i = 0; i <= 4; i++) {
     const gY = padT + (chartH / 4) * i;
-    ctx.beginPath(); ctx.moveTo(padL, gY); ctx.lineTo(padL + chartW, gY); ctx.stroke();
-    ctx.fillStyle = 'rgba(148,163,184,0.7)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(90,105,130,0.9)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'right';
     ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), padL - 3, gY + 3);
   }
 
   const avgVals = [];
 
-  data.forEach((d, i) => {
-    const bx = padL + i * barGroupW + barGap;
+  // Build the data points (total per period)
+  const pts = data.map((d, i) => {
     const total = d.onTime + d.notOnTime;
-    const h1 = d.onTime / maxVal * chartH;    // bottom segment (present/active)
-    const h2 = d.notOnTime / maxVal * chartH; // top segment (absent/blocked)
-    const totalH = total / maxVal * chartH;
-
-    // Draw bottom segment (with rounded top only if no top segment)
-    if (h1 > 0) {
-      const by1 = padT + chartH - h1;
-      ctx.fillStyle = col1;
-      ctx.beginPath();
-      if (h2 <= 0) {
-        // Full rounded top
-        ctx.moveTo(bx + rx, by1); ctx.lineTo(bx + barW - rx, by1);
-        ctx.quadraticCurveTo(bx + barW, by1, bx + barW, by1 + rx);
-        ctx.lineTo(bx + barW, by1 + h1); ctx.lineTo(bx, by1 + h1);
-        ctx.lineTo(bx, by1 + rx); ctx.quadraticCurveTo(bx, by1, bx + rx, by1);
-      } else {
-        // Flat top (top segment sits on this)
-        ctx.rect(bx, by1, barW, h1);
-      }
-      ctx.fill();
-      // Label inside if tall enough
-      if (h1 > fs + 4 && d.onTime > 0) {
-        ctx.fillStyle = '#fff'; ctx.font = `bold ${fs}px sans-serif`; ctx.textAlign = 'center';
-        ctx.fillText(d.onTime, bx + barW / 2, by1 + h1 / 2 + fs / 2 - 1);
-      }
-    }
-
-    // Draw top segment (absent/blocked) with rounded top
-    if (h2 > 0) {
-      const by2 = padT + chartH - totalH;
-      ctx.fillStyle = col2;
-      ctx.beginPath();
-      ctx.moveTo(bx + rx, by2); ctx.lineTo(bx + barW - rx, by2);
-      ctx.quadraticCurveTo(bx + barW, by2, bx + barW, by2 + rx);
-      ctx.lineTo(bx + barW, by2 + h2); ctx.lineTo(bx, by2 + h2);
-      ctx.lineTo(bx, by2 + rx); ctx.quadraticCurveTo(bx, by2, bx + rx, by2);
-      ctx.fill();
-      if (h2 > fs + 4 && d.notOnTime > 0) {
-        ctx.fillStyle = '#fff'; ctx.font = `bold ${fs}px sans-serif`; ctx.textAlign = 'center';
-        ctx.fillText(d.notOnTime, bx + barW / 2, by2 + h2 / 2 + fs / 2 - 1);
-      }
-    }
-
-    // Avg line point at top of bar
-    if (total > 0) avgVals.push({ x: bx + barW / 2, y: padT + chartH - totalH });
-
-    // X-axis label
-    ctx.fillStyle = 'rgba(148,163,184,0.85)'; ctx.font = `${fs}px sans-serif`; ctx.textAlign = 'center';
-    ctx.fillText(d.label, padL + i * barGroupW + barGroupW / 2, H - padB + fs + 4);
+    const x = padL + i * barGroupW + barGroupW / 2;
+    const y = padT + chartH - (total / maxVal * chartH);
+    return { x, y, total, label: d.label, onTime: d.onTime, notOnTime: d.notOnTime };
   });
 
-  // Avg line (attendance mode only)
-  if (mode === 'present' && avgVals.length > 1) {
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = isMax ? 2 : 1.5; ctx.setLineDash([4, 4]);
-    ctx.beginPath(); avgVals.forEach((pt, i) => { i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y); }); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#fff';
-    avgVals.forEach(pt => { ctx.beginPath(); ctx.arc(pt.x, pt.y, isMax ? 3 : 2.5, 0, Math.PI * 2); ctx.fill(); });
+  // Line color per mode
+  const lineCol = mode === 'present' ? '#4caf8e' : '#5b7cc4';
+  const fillCol = mode === 'present' ? 'rgba(76,175,142,0.12)' : 'rgba(91,124,196,0.12)';
+
+  // Helper: build a smooth curve path through the points
+  const buildCurve = () => {
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      if (i === 0) { ctx.moveTo(p.x, p.y); return; }
+      const prev = pts[i - 1];
+      const cx = (prev.x + p.x) / 2;
+      ctx.bezierCurveTo(cx, prev.y, cx, p.y, p.x, p.y);
+    });
+  };
+
+  // Fill under the curve
+  if (pts.length > 1) {
+    buildCurve();
+    ctx.lineTo(pts[pts.length - 1].x, padT + chartH);
+    ctx.lineTo(pts[0].x, padT + chartH);
+    ctx.closePath();
+    ctx.fillStyle = fillCol;
+    ctx.fill();
   }
+
+  // The curve line
+  if (pts.length > 1) {
+    buildCurve();
+    ctx.strokeStyle = lineCol;
+    ctx.lineWidth = isMax ? 3 : 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+  }
+
+  // Points + value labels + x-axis labels
+  pts.forEach((p) => {
+    // dot
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, isMax ? 4 : 3, 0, Math.PI * 2);
+    ctx.fillStyle = lineCol;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // value label above the point
+    if (p.total > 0) {
+      ctx.fillStyle = '#1a2233';
+      ctx.font = `bold ${fs}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(p.total, p.x, p.y - (isMax ? 8 : 6));
+    }
+
+    // x-axis label
+    ctx.fillStyle = 'rgba(90,105,130,0.95)';
+    ctx.font = `${fs}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(p.label, p.x, H - padB + fs + 4);
+  });
 }
 
 function _drawVerticalBars(canvas, data, mode, isMax) {
@@ -5501,12 +5793,10 @@ function _drawVerticalBars(canvas, data, mode, isMax) {
   const subBarW = mode==='present' ? (barGroupW/2 - barGap*1.5) : (barGroupW - barGap*2);
   const maxVal = Math.max(...data.map(d => d.onTime + d.notOnTime), 1);
 
-  // Grid
-  ctx.strokeStyle='rgba(30,58,95,0.7)'; ctx.lineWidth=0.8;
+  // Y-axis labels only (no horizontal gridlines)
   for (let i=0;i<=4;i++) {
     const gY = padT+(chartH/4)*i;
-    ctx.beginPath(); ctx.moveTo(padL,gY); ctx.lineTo(padL+chartW,gY); ctx.stroke();
-    ctx.fillStyle='rgba(148,163,184,0.7)'; ctx.font=`${fs}px sans-serif`; ctx.textAlign='right';
+    ctx.fillStyle='rgba(90,105,130,0.9)'; ctx.font=`${fs}px sans-serif`; ctx.textAlign='right';
     ctx.fillText(Math.round(maxVal-(maxVal/4)*i), padL-3, gY+3);
   }
 
@@ -5541,15 +5831,15 @@ function _drawVerticalBars(canvas, data, mode, isMax) {
       avgVals.push({x:x0+subBarW/2, y:padT+chartH-(d.onTime/maxVal*chartH)});
     }
 
-    ctx.fillStyle='rgba(148,163,184,0.85)'; ctx.font=`${fs}px sans-serif`; ctx.textAlign='center';
+    ctx.fillStyle='rgba(90,105,130,0.95)'; ctx.font=`${fs}px sans-serif`; ctx.textAlign='center';
     ctx.fillText(d.label, padL+i*barGroupW+barGroupW/2, H-padB+fs+4);
   });
 
   if (avgVals.length>1) {
-    ctx.strokeStyle='#fff'; ctx.lineWidth=isMax?2:1.5; ctx.setLineDash([4,4]);
+    ctx.strokeStyle='#1a2233'; ctx.lineWidth=isMax?2:1.5; ctx.setLineDash([4,4]);
     ctx.beginPath(); avgVals.forEach((pt,i)=>{ i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y); }); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='#fff';
+    ctx.fillStyle='#1a2233';
     avgVals.forEach(pt=>{ ctx.beginPath(); ctx.arc(pt.x,pt.y,isMax?3:2.5,0,Math.PI*2); ctx.fill(); });
   }
 }
@@ -5580,12 +5870,10 @@ function _drawHorizontalBars(canvas, data, mode) {
   const subBarH = mode==='present' ? (barGroupH/2-barGap*1.5) : (barGroupH-barGap*2);
   const maxVal = Math.max(...data.map(d=>d.onTime+d.notOnTime), 1);
 
-  // vertical grid lines
-  ctx.strokeStyle='rgba(30,58,95,0.7)'; ctx.lineWidth=0.8;
+  // X-axis labels only (no vertical gridlines)
   for (let i=0;i<=4;i++) {
     const gX = padL + (chartW/4)*i;
-    ctx.beginPath(); ctx.moveTo(gX,padT); ctx.lineTo(gX,padT+chartH); ctx.stroke();
-    ctx.fillStyle='rgba(148,163,184,0.7)'; ctx.font=`${fs-1}px sans-serif`; ctx.textAlign='center';
+    ctx.fillStyle='rgba(90,105,130,0.9)'; ctx.font=`${fs-1}px sans-serif`; ctx.textAlign='center';
     ctx.fillText(Math.round(maxVal/4*i), gX, padT+chartH+12);
   }
 
@@ -5623,15 +5911,15 @@ function _drawHorizontalBars(canvas, data, mode) {
     }
 
     // Y-axis labels
-    ctx.fillStyle='rgba(148,163,184,0.9)'; ctx.font=`${fs}px sans-serif`; ctx.textAlign='right';
+    ctx.fillStyle='rgba(90,105,130,0.95)'; ctx.font=`${fs}px sans-serif`; ctx.textAlign='right';
     ctx.fillText(d.label, padL-5, y0+barGroupH/2+fs/2-2);
   });
 
   if(avgVals.length>1){
-    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.setLineDash([4,4]);
+    ctx.strokeStyle='#1a2233'; ctx.lineWidth=2; ctx.setLineDash([4,4]);
     ctx.beginPath(); avgVals.forEach((pt,i)=>{ i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y); }); ctx.stroke();
     ctx.setLineDash([]);
-    ctx.fillStyle='#fff';
+    ctx.fillStyle='#1a2233';
     avgVals.forEach(pt=>{ ctx.beginPath(); ctx.arc(pt.x,pt.y,3,0,Math.PI*2); ctx.fill(); });
   }
 }
@@ -5877,10 +6165,12 @@ function toggleAcadEdit() {
     const ce = document.getElementById('changeEmail');
     const cp = document.getElementById('changePhone');
     const ct = document.getElementById('changeTagline');
+    const cls = document.getElementById('changeLoginSupport');
     if (ci) ci.value = DB.settings.academyName || '';
     if (ce) ce.value = DB.settings.email        || '';
     if (cp) cp.value = DB.settings.phone        || '';
     if (ct) ct.value = DB.settings.tagline      || '';
+    if (cls) cls.value = DB.settings.loginSupport || '';
     updateLoginBgPreview();
     // Scroll to card
     fields.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -5892,12 +6182,14 @@ function saveAcadDetails() {
   const email   = document.getElementById('changeEmail')?.value.trim();
   const phone   = document.getElementById('changePhone')?.value.trim();
   const tagline = document.getElementById('changeTagline')?.value.trim();
+  const loginSupport = document.getElementById('changeLoginSupport')?.value.trim();
   if (!name) { showToast('Academy name is required','error'); return; }
   confirm_('💾','Save Academy Details','Save all changes to academy profile?', () => {
     DB.settings.academyName = name;
     DB.settings.email   = email   || DB.settings.email;
     DB.settings.phone   = phone   || DB.settings.phone;
     DB.settings.tagline = tagline || DB.settings.tagline;
+    DB.settings.loginSupport = loginSupport;
     saveLocal();
     scheduleFirebasePush();
     addLog('settings','Academy profile updated');
@@ -5921,9 +6213,11 @@ function applyAcadSettings() {
   const pEmail = document.getElementById('profileEmail');   if(pEmail)  pEmail.textContent = e;
   const pPhone = document.getElementById('profilePhone');   if(pPhone)  pPhone.textContent = p;
   const pTag   = document.getElementById('profileTagline'); if(pTag)    pTag.textContent   = t;
-  // Login screen
-  const lTitle = document.getElementById('loginAcadTitle'); if(lTitle)  lTitle.textContent = n;
-  const lTag   = document.getElementById('loginTagline');   if(lTag)    lTag.textContent   = t;
+  // Login screen — "Welcome Back" title, sign-in subtitle, support line
+  const lTitle = document.getElementById('loginAcadTitle'); if(lTitle)  lTitle.textContent = 'Welcome Back';
+  const lTag   = document.getElementById('loginTagline');   if(lTag)    lTag.textContent   = 'Sign in to ' + n;
+  const lSup   = document.getElementById('loginSupport');
+  if (lSup) lSup.textContent = DB.settings.loginSupport || '';
 }
 
 function saveAcadName() { saveAcadDetails(); } // legacy alias
@@ -6282,7 +6576,7 @@ function updateLogos() {
     el.innerHTML = url ? `<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">` : '⚔️';
   });
   const ll = document.getElementById('loginLogo');
-  if (ll) ll.innerHTML = url ? `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '⚔️';
+  if (ll) ll.innerHTML = url ? `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '<svg viewBox="0 0 24 24" fill="#e8392f" width="40" height="40"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z"/></svg>';
 }
 
 // ----------------------------------------------------------------
@@ -6864,7 +7158,7 @@ function renderClassLog() {
     const inDisp  = fmt12(e.inTime);
     const outDisp = fmt12(e.outTime);
 
-    return `<div style="padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+    return `<div class="hover-row" style="padding:11px 13px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;transition:background .15s ease;">
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
           <span style="font-size:13px;font-weight:700;color:var(--gold);">${escHtml(dateDisp)}</span>
@@ -7007,6 +7301,26 @@ function saveAssignBatch() {
     ? `Assigned ${assignedBatches.length} batch(es) to ${userName} ✓`
     : `${userName} can now access all batches ✓`, 'success');
 }
+
+function toggleTheme() {
+  const dark = document.body.classList.toggle('dark-theme');
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = dark ? '☀️ Light' : '🌙 Dark';
+  try { localStorage.setItem('sac_theme', dark ? 'dark' : 'light'); } catch(e) {}
+  // Redraw charts so canvas colors match the new theme
+  if (typeof renderHomeTileChart === 'function') { try { renderHomeTileChart(); } catch(e) {} }
+}
+// Apply saved theme on load
+(function(){
+  try {
+    if (localStorage.getItem('sac_theme') === 'dark') {
+      document.body.classList.add('dark-theme');
+      const setLabel = () => { const b=document.getElementById('themeToggleBtn'); if(b) b.textContent='☀️ Light'; };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setLabel);
+      else setLabel();
+    }
+  } catch(e) {}
+})();
 
 function openSettingsModal() {
 
