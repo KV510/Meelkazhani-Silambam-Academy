@@ -25,7 +25,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-  import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js';
+  import { initializeAppCheck, ReCaptchaV3Provider, getToken } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js';
 
   // ── YOUR FIREBASE CONFIG (safe to have here — Auth token protects data) ──
   const firebaseConfig = {
@@ -44,10 +44,20 @@
   // Replace 'YOUR_RECAPTCHA_SITE_KEY' with the site key from
   // Firebase Console → App Check → register web app → reCAPTCHA v3.
   try {
-    initializeAppCheck(app, {
+    const appCheck = initializeAppCheck(app, {
       provider: new ReCaptchaV3Provider('6LcgpCAtAAAAAFFkiBfD6XumWaK5r8dXGz3ryM58'),
       isTokenAutoRefreshEnabled: true
     });
+    // Expose a helper so REST calls can attach the App Check token
+    window._fbGetAppCheckToken = async () => {
+      try {
+        const result = await getToken(appCheck, /* forceRefresh */ false);
+        return result && result.token ? result.token : '';
+      } catch (e) {
+        console.warn('App Check token fetch failed:', e);
+        return '';
+      }
+    };
   } catch (e) {
     console.warn('App Check init skipped:', e);
   }
@@ -2250,7 +2260,8 @@ function deleteSnapshot(key) {
         const _fbUser = window._fbAuth && window._fbAuth.currentUser;
         const _token = _fbUser ? await _fbUser.getIdToken() : '';
         const _delAuth = _token ? '?auth=' + encodeURIComponent(_token) : '';
-        await fetch(fbBaseUrl() + '/snapshots/' + key + '.json' + _delAuth, { method: 'DELETE' });
+        const _delHdrs = await fbHeaders();
+        await fetch(fbBaseUrl() + '/snapshots/' + key + '.json' + _delAuth, { method: 'DELETE', headers: _delHdrs });
         DB.snapshotIndex = (DB.snapshotIndex || []).filter(s => s.key !== key);
         scheduleFirebasePush();
         renderSnapshotList();
@@ -2424,12 +2435,14 @@ function toggleLoginPass() {
   const pw = document.getElementById('loginPass');
   if (pw) pw.type = pw.type === 'password' ? 'text' : 'password';
 }
-function showLoginError(msg) {
+function showLoginError(msg, opts) {
+  const quiet = opts && opts.quiet;  // quiet = update text only, no shake/select
   const el = document.getElementById('loginError');
   const msgEl = document.getElementById('loginErrorMsg');
   const box = document.querySelector('.login-box');
   if (msgEl) msgEl.textContent = msg;
   if (el) el.classList.add('show');
+  if (quiet) return;  // skip shake + field highlight for repeated countdown updates
   // Shake the login box
   if (box) {
     box.classList.remove('login-shake');
@@ -2442,6 +2455,12 @@ function showLoginError(msg) {
   if (pwEl) { pwEl.style.borderColor = '#ef4444'; pwEl.select(); }
 }
 async function doLogin() {
+
+  // ── Progressive lockout check ──
+  if (_loginLockUntil && Date.now() < _loginLockUntil) {
+    _showLockoutCountdown();
+    return;
+  }
 
   const rawId = document.getElementById('loginId').value.trim().toLowerCase();
   const email = rawId.includes('@') ? rawId : rawId + '@silambam.app';
@@ -2475,6 +2494,7 @@ async function doLogin() {
 
     // Step 3: Launch app
     DB.users = users;
+    _loginFailCount = 0; _loginLockUntil = 0; _persistLockout();  // reset lockout on success
     clearLoginError();
     btn.textContent = 'Login →'; btn.disabled = false;
     currentUser = user;
@@ -2516,13 +2536,92 @@ async function doLogin() {
     if (code === 'auth/user-not-found' || code === 'auth/invalid-email') {
       showLoginError('User ID not found. Check and try again.');
     } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-      showLoginError('Incorrect password. Please try again.');
+      // Count the failed attempt and apply progressive lockout
+      _loginFailCount++;
+      // Lockout waits in seconds, starting from the 3rd wrong attempt
+      // 3rd:30s, 4th:1m, 5th:10m, 6th:6h, 7th:1day, 8th:1week, 9th+:1month
+      const waits = [
+        30,            // 3rd
+        60,            // 4th  (1 min)
+        600,           // 5th  (10 min)
+        6 * 3600,      // 6th  (6 hours)
+        24 * 3600,     // 7th  (1 day)
+        7 * 24 * 3600, // 8th  (1 week)
+        30 * 24 * 3600 // 9th+ (1 month)
+      ];
+      if (_loginFailCount >= 3) {
+        const idx = Math.min(_loginFailCount - 3, waits.length - 1);
+        const waitSec = waits[idx];
+        _loginLockUntil = Date.now() + waitSec * 1000;
+        _persistLockout();
+        _showLockoutCountdown();
+      } else {
+        _persistLockout();
+        const left = 3 - _loginFailCount; // attempts before lock
+        showLoginError(`Incorrect password. ⚠️ ${left} more wrong attempt${left>1?'s':''} will lock login temporarily.`);
+      }
     } else if (code === 'auth/too-many-requests') {
       showLoginError('Too many attempts. Try again later.');
     } else {
       showLoginError(err.message || 'Login failed. Please try again.');
     }
   }
+}
+
+// ── Progressive login lockout state + countdown ──
+let _loginFailCount = 0;
+let _loginLockUntil = 0;
+let _lockTimer = null;
+
+// Restore persisted lockout on page load (so refresh doesn't bypass it)
+(function _restoreLockout(){
+  try {
+    const fc = parseInt(localStorage.getItem('sac_login_failcount') || '0');
+    const lu = parseInt(localStorage.getItem('sac_login_lockuntil') || '0');
+    if (!isNaN(fc)) _loginFailCount = fc;
+    if (!isNaN(lu)) _loginLockUntil = lu;
+  } catch(e) {}
+  // If a lock is still active, show the countdown once the page is ready
+  if (_loginLockUntil && Date.now() < _loginLockUntil) {
+    const start = () => { try { _showLockoutCountdown(); } catch(e) {} };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+  }
+})();
+
+function _persistLockout(){
+  try {
+    localStorage.setItem('sac_login_failcount', String(_loginFailCount));
+    localStorage.setItem('sac_login_lockuntil', String(_loginLockUntil));
+  } catch(e) {}
+}
+function _showLockoutCountdown() {
+  const btn = document.getElementById('loginBtn');
+  if (_lockTimer) clearInterval(_lockTimer);
+  const fmt = (secs) => {
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    if (d > 0) return `${d}d ${h}h`;
+    if (h > 0) return `${h}h ${m}m`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+  const tick = () => {
+    const remain = Math.ceil((_loginLockUntil - Date.now()) / 1000);
+    if (remain <= 0) {
+      clearInterval(_lockTimer); _lockTimer = null;
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign In to Portal'; }
+      clearLoginError();
+      return;
+    }
+    const tStr = fmt(remain);
+    showLoginError(`🔒 Too many wrong attempts. Login locked. Try again in ${tStr}.`, { quiet: true });
+    if (btn) { btn.disabled = true; btn.textContent = `Locked (${tStr})`; }
+  };
+  tick();
+  _lockTimer = setInterval(tick, 1000);
 }
 // ================================================================
 // FIRST-TIME SETUP
@@ -2688,10 +2787,23 @@ async function fbRestUrl(path) {
   return fbBaseUrl() + path + '.json' + (token ? sep + 'auth=' + encodeURIComponent(token) : '');
 }
 
+// Build headers including the App Check token (if available)
+async function fbHeaders(extra) {
+  const headers = Object.assign({}, extra || {});
+  try {
+    if (window._fbGetAppCheckToken) {
+      const acToken = await window._fbGetAppCheckToken();
+      if (acToken) headers['X-Firebase-AppCheck'] = acToken;
+    }
+  } catch(e) {}
+  return headers;
+}
+
 // GET — fetch data from Firebase REST
 async function fbGet(path) {
   const url = await fbRestUrl(path);
-  const res = await fetch(url);
+  const headers = await fbHeaders();
+  const res = await fetch(url, { headers });
   if (!res.ok) throw new Error('Firebase GET failed: ' + res.status);
   return res.json();
 }
@@ -2699,9 +2811,10 @@ async function fbGet(path) {
 // PUT — write data to Firebase REST
 async function fbPut(path, data) {
   const url = await fbRestUrl(path);
+  const headers = await fbHeaders({ 'Content-Type': 'application/json' });
   const res = await fetch(url, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(data)
   });
   if (!res.ok) throw new Error('Firebase PUT failed: ' + res.status);
@@ -2972,7 +3085,8 @@ async function fetchUsersForLogin() {
   for (const path of paths) {
     try {
       const url = await fbRestUrl(path);
-      const r = await fetch(url);
+      const headers = await fbHeaders();
+      const r = await fetch(url, { headers });
       if (!r.ok) continue;
       const data = await r.json();
       if (!data) continue;
@@ -7380,9 +7494,10 @@ function deleteClassLog(id) {
         const _auth   = _token ? '?auth=' + encodeURIComponent(_token) : '';
         // Push the full updated classLog array to Firebase
         const url = fbBaseUrl() + '/sacdb/classLog.json' + _auth;
+        const _hdrs = await fbHeaders({ 'Content-Type': 'application/json' });
         await fetch(url, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: _hdrs,
           body: JSON.stringify(DB.classLog)
         });
       } catch(e) {
@@ -7575,7 +7690,8 @@ async function deleteSnapshotSettings(key) {
         const _fbUser = window._fbAuth && window._fbAuth.currentUser;
         const _token  = _fbUser ? await _fbUser.getIdToken() : '';
         const _auth   = _token ? '?auth=' + encodeURIComponent(_token) : '';
-        await fetch(fbBaseUrl() + '/snapshots/' + key + '.json' + _auth, { method: 'DELETE' });
+        const _delHdrs2 = await fbHeaders();
+        await fetch(fbBaseUrl() + '/snapshots/' + key + '.json' + _auth, { method: 'DELETE', headers: _delHdrs2 });
         DB.snapshotIndex = (DB.snapshotIndex || []).filter(s => s.key !== key);
         scheduleFirebasePush();
         renderSnapshotListSettings();
