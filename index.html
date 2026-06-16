@@ -29,13 +29,13 @@
 
   // ── YOUR FIREBASE CONFIG (safe to have here — Auth token protects data) ──
   const firebaseConfig = {
-    apiKey:            "AIzaSyBwte6f0d0m5ivE2UpdWu2dnbWFkdqrgdM",
-    authDomain:        "meelkazhani-silambam-academy.firebaseapp.com",
-    databaseURL:       "https://meelkazhani-silambam-academy-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId:         "meelkazhani-silambam-academy",
-    storageBucket:     "meelkazhani-silambam-academy.firebasestorage.app",
-    messagingSenderId: "338928841762",
-    appId:             "1:338928841762:web:aebefe53d5c4c317a9867b"
+  apiKey: "AIzaSyBwte6f0d0m5ivE2UpdWu2dnbWFkdqrgdM",
+  authDomain: "meelkazhani-silambam-academy.firebaseapp.com",
+  databaseURL: "https://meelkazhani-silambam-academy-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "meelkazhani-silambam-academy",
+  storageBucket: "meelkazhani-silambam-academy.firebasestorage.app",
+  messagingSenderId: "338928841762",
+  appId: "1:338928841762:web:aebefe53d5c4c317a9867b"
   };
 
   const app  = initializeApp(firebaseConfig);
@@ -477,11 +477,18 @@ body { font-family: 'Poppins', 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode M
 
 <!-- LOADING OVERLAY -->
 <div id="loadingOverlay">
-  <div style="font-size:48px;">⚔️</div>
-  <div class="loading-spinner"></div>
+  <div style="position:relative;width:110px;height:110px;">
+    <svg id="loadRingSvg" width="110" height="110" viewBox="0 0 110 110" style="animation:loadRingSpin 1.1s linear infinite;">
+      <circle cx="55" cy="55" r="46" fill="none" stroke="#d3dae6" stroke-width="7"/>
+      <circle cx="55" cy="55" r="46" fill="none" stroke="#5b7cc4" stroke-width="7" stroke-linecap="round" stroke-dasharray="70 220"/>
+      <circle cx="55" cy="55" r="46" fill="none" stroke="#5b7cc4" stroke-width="7" stroke-linecap="round" stroke-dasharray="70 220" stroke-dashoffset="-145"/>
+    </svg>
+    <div id="loadPct" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--white);">0%</div>
+  </div>
   <div class="loading-msg" id="loadingMsg">Loading data…</div>
-  <div class="loading-sub" id="loadingSub">Syncing with Firebase</div>
+  <div class="loading-sub" id="loadingSub"></div>
 </div>
+<style>@keyframes loadRingSpin{to{transform:rotate(360deg)}}</style>
 
 <!-- MAIN APP -->
 <div id="app">
@@ -584,6 +591,10 @@ body { font-family: 'Poppins', 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode M
         </div>
         <div style="overflow:hidden;">
           <canvas id="homeTileCanvas" style="display:block;"></canvas>
+        </div>
+        <div id="homeTileLegend" style="display:flex;justify-content:center;gap:18px;margin-top:8px;font-size:11px;font-weight:600;">
+          <span style="display:flex;align-items:center;gap:5px;"><span id="legendDot1" style="width:11px;height:11px;border-radius:50%;background:#4caf8e;display:inline-block;"></span><span id="legendLabel1" style="color:var(--offwhite);">Present</span></span>
+          <span style="display:flex;align-items:center;gap:5px;"><span id="legendDot2" style="width:11px;height:11px;border-radius:50%;background:#e06b6b;display:inline-block;"></span><span id="legendLabel2" style="color:var(--offwhite);">Absent</span></span>
         </div>
         <div style="text-align:right;margin-top:6px;">
           <button onclick="openChartMax()" style="background:none;border:none;color:var(--accent2);font-size:11px;font-weight:700;cursor:pointer;padding:0;">⛶ Expand</button>
@@ -921,7 +932,7 @@ body { font-family: 'Poppins', 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode M
             <div style="font-weight:700;font-size:15px;line-height:1.3;" id="profileAcadName">MEELKAZHANI SILAMBAM ACADEMY</div>
             <div style="font-size:12px;color:var(--gray);margin-top:2px;" id="profileEmail"></div>
             <div style="font-size:12px;color:var(--gray);" id="profilePhone"></div>
-            <div style="font-size:11px;color:var(--graydk);margin-top:1px;" id="profileTagline">Admin &amp; Staff Portal</div>
+            <div style="font-size:11px;color:var(--graydk);margin-top:1px;" id="profileTagline"></div>
           </div>
           <button id="acadEditBtn" style="display:none;flex-shrink:0;background:var(--accent2);border:none;color:#fff;border-radius:8px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;" onclick="toggleAcadEdit()">✏️ Edit</button>
         </div>
@@ -1630,7 +1641,7 @@ body { font-family: 'Poppins', 'Segoe UI', 'Noto Sans', Roboto, 'Arial Unicode M
 // DATABASE
 // ================================================================
 let DB = {
-  settings: { academyName:'MEELKAZHANI SILAMBAM ACADEMY', logoUrl:'', email:'', phone:'', tagline:'Admin & Staff Portal', loginBgUrl:'', loginSupport:'', firebaseUrl:'', lastPush:'', lastPushBy:'', msgTemplate:'Dear {name}, your fee for {month} is pending at {academy}. Kindly pay at the earliest. Thank you.' },
+  settings: { academyName:'MEELKAZHANI SILAMBAM ACADEMY', logoUrl:'', email:'', phone:'', tagline:'', loginBgUrl:'', loginSupport:'', firebaseUrl:'', lastPush:'', lastPushBy:'', msgTemplate:'Dear {name}, your fee for {month} is pending at {academy}. Kindly pay at the earliest. Thank you.' },
   users: [
     { id:'admin', email:'admin@youracademy.com', name:'Admin', role:'admin' },
     { id:'staff1', email:'staff1@youracademy.com', name:'Staff 1', role:'staff' }
@@ -2378,6 +2389,46 @@ function mergeLogArrays(localArr, remoteArr, max) {
   return max ? merged.slice(0, max) : merged;
 }
 
+// Time-aware greeting for the top bar (Good morning/afternoon/evening)
+function greetingText() {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
+}
+
+// ----------------------------------------------------------------
+// LOADING PROGRESS RING (0→90% while loading, →100% when done)
+// ----------------------------------------------------------------
+let _loadPctVal = 0;
+let _loadPctTimer = null;
+function startLoadProgress() {
+  _loadPctVal = 0;
+  const el = document.getElementById('loadPct');
+  if (el) el.textContent = '0%';
+  if (_loadPctTimer) clearInterval(_loadPctTimer);
+  _loadPctTimer = setInterval(() => {
+    // Climb fast early, slow down approaching 90%, never reach 100% on its own
+    if (_loadPctVal < 90) {
+      const step = _loadPctVal < 50 ? (Math.random() * 8 + 3) : (Math.random() * 3 + 1);
+      _loadPctVal = Math.min(90, _loadPctVal + step);
+      const el2 = document.getElementById('loadPct');
+      if (el2) el2.textContent = Math.round(_loadPctVal) + '%';
+    }
+  }, 200);
+}
+function finishLoadProgress(cb) {
+  if (_loadPctTimer) { clearInterval(_loadPctTimer); _loadPctTimer = null; }
+  // Animate the remaining way to 100%, then run the callback
+  const el = document.getElementById('loadPct');
+  const finish = setInterval(() => {
+    _loadPctVal = Math.min(100, _loadPctVal + 4);
+    if (el) el.textContent = Math.round(_loadPctVal) + '%';
+    if (_loadPctVal >= 100) {
+      clearInterval(finish);
+      setTimeout(() => { if (cb) cb(); }, 200);
+    }
+  }, 25);
+}
+
 // ----------------------------------------------------------------
 // TOAST & CONFIRM
 // ----------------------------------------------------------------
@@ -2506,11 +2557,12 @@ async function doLogin() {
     const loadMsg = document.getElementById('loadingMsg');
     const loadSub = document.getElementById('loadingSub');
     if (overlay) overlay.classList.add('active');
+    startLoadProgress();
     if (loadMsg) loadMsg.textContent = 'Welcome, ' + (user.name || user.id) + '!';
-    if (loadSub) loadSub.textContent = 'Fetching latest data from server…';
+    if (loadSub) loadSub.textContent = '';
     document.getElementById('topRoleBadge').textContent = isAdmin() ? 'Admin' : 'Staff';
     const nameEl = document.getElementById('topUserName');
-    if (nameEl) nameEl.textContent = user.name || user.id;
+    if (nameEl) nameEl.textContent = greetingText() + ', ' + (user.name || user.id);
     applyRoleUI();
     updateLogos();
     // NOTE: addLog('login', ...) is intentionally NOT called here.
@@ -2519,15 +2571,19 @@ async function doLogin() {
     // with the empty default in-memory DB.
 
     initFirebase().then(() => {
-      if (overlay) overlay.classList.remove('active');
-      // Safe to log the login now — DB has the real data from Firebase.
-      addLog('login', 'Logged in');
-      if (isDefaultPassword(user)) {
-        showChangePassScreen();
-      } else {
-        showToast('Welcome, ' + (user.name || user.id) + '! ✓', 'success');
-        launchApp();
-      }
+      finishLoadProgress(() => {
+        if (overlay) overlay.classList.remove('active');
+        updateLogos();  // refresh logo now that DB.settings.logoUrl is loaded
+        applyAcadSettings();  // refresh academy name/tagline now that settings are loaded
+        // Safe to log the login now — DB has the real data from Firebase.
+        addLog('login', 'Logged in');
+        if (isDefaultPassword(user)) {
+          showChangePassScreen();
+        } else {
+          showToast('Welcome, ' + (user.name || user.id) + '! ✓', 'success');
+          launchApp();
+        }
+      });
     });
 
   } catch(err) {
@@ -5270,6 +5326,7 @@ function navDash(type, dir) {
 }
 function loadDashboard() {
   updateDashNavLabel();
+
   // Read selected month/year from the filter selectors
   const mSel = document.getElementById('dashMonth');
   const ySel = document.getElementById('dashYear');
@@ -5569,25 +5626,25 @@ function renderHomeTileChart() {
   const canvas = document.getElementById('homeTileCanvas');
   if (!canvas) return;
 
-  // Update title and legends
+  // Update title and legend
   const titleEl = document.getElementById('homeTileChartTitle');
-  const leg1Dot  = document.getElementById('homeTileLeg1Dot');
-  const leg1Text = document.getElementById('homeTileLeg1Text');
-  const leg2Dot  = document.getElementById('homeTileLeg2Dot');
-  const leg2Text = document.getElementById('homeTileLeg2Text');
+  const leg1Dot  = document.getElementById('legendDot1');
+  const leg1Text = document.getElementById('legendLabel1');
+  const leg2Dot  = document.getElementById('legendDot2');
+  const leg2Text = document.getElementById('legendLabel2');
 
   if (homeTileMode === 'present') {
     if (titleEl) titleEl.textContent = '📊 Attendance';
-    if (leg1Dot)  leg1Dot.style.background  = '#22c55e';
+    if (leg1Dot)  leg1Dot.style.background  = '#4caf8e';
     if (leg1Text) leg1Text.textContent       = 'Present';
-    if (leg2Dot)  leg2Dot.style.background  = '#f87171';
+    if (leg2Dot)  leg2Dot.style.background  = '#e06b6b';
     if (leg2Text) leg2Text.textContent       = 'Absent';
   } else {
     if (titleEl) titleEl.textContent = '📊 Strength';
-    if (leg1Dot)  leg1Dot.style.background  = '#2563eb';
-    if (leg1Text) leg1Text.textContent       = 'Joined';
-    if (leg2Dot)  leg2Dot.style.background  = '#ef4444';
-    if (leg2Text) leg2Text.textContent       = 'Blocked';
+    if (leg1Dot)  leg1Dot.style.background  = '#5b7cc4';
+    if (leg1Text) leg1Text.textContent       = 'Active';
+    if (leg2Dot)  leg2Dot.style.background  = '#e0a05a';
+    if (leg2Text) leg2Text.textContent       = 'Dropped';
   }
 
   const mSel = document.getElementById('dashMonth');
@@ -5742,9 +5799,16 @@ function _showHomeTileTooltip(canvas, cx, cy) {
     canvas.parentElement.appendChild(tip);
   }
   tip.innerHTML = `<span style="color:${best.color};">●</span> ${best.kind}: ${best.p.v} (Day ${best.p.label})`;
-  tip.style.left = Math.min(best.p.x + 6, W - 110) + 'px';
-  tip.style.top  = Math.max(best.p.y - 26, 2) + 'px';
   tip.style.display = 'block';
+  // Measure actual tooltip width, then position so it never overflows the chart
+  const tw = tip.offsetWidth || 120;
+  let left = best.p.x + 8;
+  // If it would overflow the right edge, flip it to the left of the point
+  if (left + tw > W - 4) left = best.p.x - tw - 8;
+  // Final clamp so it never goes past either edge
+  left = Math.max(4, Math.min(left, W - tw - 4));
+  tip.style.left = left + 'px';
+  tip.style.top  = Math.max(best.p.y - 28, 2) + 'px';
 }
 // ─────────────────────────────────────────────────────────────────
 
@@ -5893,9 +5957,14 @@ function _showChartMaxTooltip(canvas, cx, cy) {
     canvas.parentElement.appendChild(tip);
   }
   tip.innerHTML = `<span style="color:${best.color};">●</span> ${best.kind}: ${best.p.v} (Day ${best.p.label})`;
-  tip.style.left = Math.min(best.p.x + 8, _chartMaxPts.W - 120) + 'px';
-  tip.style.top  = Math.max(best.p.y - 30, 4) + 'px';
   tip.style.display = 'block';
+  const W = _chartMaxPts.W;
+  const tw = tip.offsetWidth || 130;
+  let left = best.p.x + 8;
+  if (left + tw > W - 4) left = best.p.x - tw - 8;
+  left = Math.max(4, Math.min(left, W - tw - 4));
+  tip.style.left = left + 'px';
+  tip.style.top  = Math.max(best.p.y - 30, 4) + 'px';
 }
 function _hideChartMaxTooltip() {
   const tip = document.getElementById('chartMaxTooltip');
@@ -6380,7 +6449,7 @@ function renderMsgLog() {
 function renderAdminNameField() {
   // Show/hide edit button
   const editBtn = document.getElementById('acadEditBtn');
-  if (editBtn) editBtn.style.display = isAdmin() ? '' : 'none';
+  if (editBtn) { editBtn.style.display = isAdmin() ? '' : 'none'; editBtn.textContent = '✏️ Edit'; }
   // Always start collapsed
   const fields = document.getElementById('adminProfileFields');
   if (fields) fields.style.display = 'none';
@@ -6433,7 +6502,7 @@ function saveAcadDetails() {
     DB.settings.academyName = name;
     DB.settings.email   = email   || DB.settings.email;
     DB.settings.phone   = phone   || DB.settings.phone;
-    DB.settings.tagline = tagline || DB.settings.tagline;
+    DB.settings.tagline = tagline;
     DB.settings.loginSupport = loginSupport;
     saveLocal();
     scheduleFirebasePush();
@@ -6452,7 +6521,7 @@ function applyAcadSettings() {
   const t = DB.settings.tagline     || '';
   // Top bar
   const topName = document.getElementById('topAcadName');
-  if (topName) topName.textContent = n.replace(/ ACADEMY$/i,'').replace(/ SILAMBAM$/i,'') || n;
+  if (topName) topName.textContent = n;
   // Profile card
   ['profileAcadName'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=n; });
   const pEmail = document.getElementById('profileEmail');   if(pEmail)  pEmail.textContent = e;
@@ -7294,18 +7363,23 @@ setInterval(() => {
       touchSession();
       const overlay = document.getElementById('loadingOverlay');
       if (overlay) overlay.classList.add('active');
+      startLoadProgress();
       document.getElementById('topRoleBadge').textContent = isAdmin() ? 'Admin' : 'Staff';
       const nameEl = document.getElementById('topUserName');
-      if (nameEl) nameEl.textContent = user.name || user.id;
+      if (nameEl) nameEl.textContent = greetingText() + ', ' + (user.name || user.id);
       applyRoleUI();
       updateLogos();
       initFirebase().then(() => {
-        if (overlay) overlay.classList.remove('active');
-        // Log the auto-login only AFTER the pull has populated DB,
-        // otherwise the push could race the pull and wipe cloud data.
-        addLog('login', 'Auto-login (session restored)');
-        showToast('Welcome back, ' + (user.name || user.id) + '! ✓', 'success');
-        launchApp();
+        finishLoadProgress(() => {
+          if (overlay) overlay.classList.remove('active');
+          updateLogos();  // refresh logo now that DB.settings.logoUrl is loaded
+          applyAcadSettings();  // refresh academy name/tagline now that settings are loaded
+          // Log the auto-login only AFTER the pull has populated DB,
+          // otherwise the push could race the pull and wipe cloud data.
+          addLog('login', 'Auto-login (session restored)');
+          showToast('Welcome back, ' + (user.name || user.id) + '! ✓', 'success');
+          launchApp();
+        });
       });
     } catch(e) { /* session restore failed — user stays on login */ }
   });
@@ -7474,7 +7548,7 @@ function renderClassLog() {
       </div>
       ${canManage ? `<div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
         <button onclick="openClassLogEditModal('${escHtml(e.id)}')" class="btn btn-primary btn-xs">✏️ Edit</button>
-        <button onclick="deleteClassLog('${escHtml(e.id)}')" class="btn btn-danger btn-xs">🗑️</button>
+        <button onclick="deleteClassLog('${escHtml(e.id)}')" class="btn btn-danger btn-xs">🗑️ Delete</button>
       </div>` : ''}
     </div>`;
   }).join('');
